@@ -100,17 +100,18 @@ export default function CartPage() {
         cart?.items.length ? (
           <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
             <div className="space-y-4">
-              {cart.items.map((item) => (
-                <CartItemCard
-                  key={item.itemId}
-                  item={item}
-                  disabled={
-                    updateMutation.isPending || removeMutation.isPending || clearMutation.isPending
-                  }
-                  onIncrement={updateQty}
-                  onDecrement={updateQty}
-                  onRemove={removeItem}
-                />
+              {cart.items.map((item, idx) => (
+                <div key={item.itemId} className="animate-fade-up" style={{ animationDelay: `${idx * 50}ms` }}>
+                  <CartItemCard
+                    item={item}
+                    disabled={
+                      updateMutation.isPending || removeMutation.isPending || clearMutation.isPending
+                    }
+                    onIncrement={updateQty}
+                    onDecrement={updateQty}
+                    onRemove={removeItem}
+                  />
+                </div>
               ))}
             </div>
 

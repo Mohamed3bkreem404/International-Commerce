@@ -66,13 +66,13 @@ export default function HomePage() {
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Button size="lg" asChild>
-                <Link href="/products">
+                <Link href="/login">
                   Start Shopping
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <Link href="/login">Access Dashboard</Link>
+                <Link href="/signup">Create account</Link>
               </Button>
             </div>
           </div>

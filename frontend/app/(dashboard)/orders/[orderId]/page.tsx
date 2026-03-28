@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CreditCard, XCircle } from "lucide-react";
+import { ArrowLeft, Clock3, CreditCard, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -75,7 +75,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
     <section className="space-y-5">
       <PageHeader
         title="Order Details"
-        subtitle="Inspect item breakdown, status, and payment state for this order."
+        subtitle="Inspect item breakdown, delivery information, and payment status for this order."
         actions={
           <Button variant="outline" asChild>
             <Link href="/orders">
@@ -96,8 +96,8 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
 
       {!orderQuery.isLoading && !orderQuery.isError && order ? (
         <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
-          <Card>
-            <CardHeader>
+          <Card className="animate-fade-up overflow-hidden">
+            <CardHeader className="border-b border-border/70 bg-secondary/20">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <CardTitle>Order #{order.orderId.slice(0, 8)}</CardTitle>
                 <div className="flex gap-2">
@@ -111,6 +111,16 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Order ID</p>
+                  <p className="mt-2 text-sm">{order.orderId}</p>
+                </div>
+                <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Created At</p>
+                  <p className="mt-2 text-sm">{formatDateTime(order.createdAt)}</p>
+                </div>
+              </div>
               <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                   Shipping Address
@@ -134,11 +144,17 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
             </CardContent>
           </Card>
 
-          <Card className="h-fit">
+          <Card className="h-fit animate-fade-up" style={{ animationDelay: "70ms" }}>
             <CardHeader>
               <CardTitle>Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
+              <div className="rounded-2xl border border-border/70 bg-secondary/20 p-3 text-sm text-muted-foreground">
+                <p className="inline-flex items-center gap-1.5">
+                  <Clock3 className="h-4 w-4" />
+                  Order placed on {formatDateTime(order.createdAt)}
+                </p>
+              </div>
               {canCancel ? (
                 <Button
                   variant="destructive"

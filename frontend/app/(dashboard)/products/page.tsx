@@ -36,6 +36,11 @@ export default function ProductsPage() {
   }, [productsQuery.data, deferredQuery, inStockOnly]);
 
   const onAddToCart = async (productId: string) => {
+    if (!productId) {
+      toast.error("This product is unavailable right now. Please refresh and try again.");
+      return;
+    }
+
     try {
       await addToCartMutation.mutateAsync({ productId, quantity: 1 });
       toast.success("Item added to cart.");

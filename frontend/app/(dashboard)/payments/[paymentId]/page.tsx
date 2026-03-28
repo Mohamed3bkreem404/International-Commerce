@@ -27,7 +27,7 @@ export default function PaymentDetailsPage({ params }: PaymentDetailsPageProps) 
     <section className="space-y-5">
       <PageHeader
         title="Payment Details"
-        subtitle="Inspect transaction reference and payment metadata."
+        subtitle="Inspect transaction reference, payment metadata, and order linkage."
         actions={
           <Button variant="outline" asChild>
             <Link href="/payments">
@@ -47,8 +47,8 @@ export default function PaymentDetailsPage({ params }: PaymentDetailsPageProps) 
       ) : null}
 
       {!paymentQuery.isLoading && !paymentQuery.isError && payment ? (
-        <Card>
-          <CardHeader>
+        <Card className="animate-fade-up overflow-hidden">
+          <CardHeader className="border-b border-border/70 bg-secondary/20">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <CardTitle>{payment.transactionReference}</CardTitle>
@@ -59,7 +59,7 @@ export default function PaymentDetailsPage({ params }: PaymentDetailsPageProps) 
               <StatusBadge value={payment.paymentStatus} />
             </div>
           </CardHeader>
-          <CardContent className="grid gap-3 sm:grid-cols-2">
+          <CardContent className="grid gap-3 pt-5 sm:grid-cols-2">
             <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Amount</p>
               <p className="mt-2 text-lg font-semibold">{toCurrency(payment.amount)}</p>

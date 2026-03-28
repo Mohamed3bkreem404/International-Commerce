@@ -84,18 +84,19 @@ export default function OrdersPage() {
       {!ordersQuery.isLoading && !ordersQuery.isError ? (
         ordersQuery.data?.length ? (
           <div className="space-y-4">
-            {ordersQuery.data.map((order) => (
-              <OrderCard
-                key={order.orderId}
-                order={order}
-                loading={cancelMutation.isPending || createPaymentMutation.isPending}
-                selectedMethod={methodByOrder[order.orderId] || "CARD"}
-                selectedNotes={notesByOrder[order.orderId] || ""}
-                onMethodChange={setMethod}
-                onNotesChange={setNotes}
-                onCancel={cancelOrder}
-                onPay={payOrder}
-              />
+            {ordersQuery.data.map((order, idx) => (
+              <div key={order.orderId} className="animate-fade-up" style={{ animationDelay: `${idx * 60}ms` }}>
+                <OrderCard
+                  order={order}
+                  loading={cancelMutation.isPending || createPaymentMutation.isPending}
+                  selectedMethod={methodByOrder[order.orderId] || "CARD"}
+                  selectedNotes={notesByOrder[order.orderId] || ""}
+                  onMethodChange={setMethod}
+                  onNotesChange={setNotes}
+                  onCancel={cancelOrder}
+                  onPay={payOrder}
+                />
+              </div>
             ))}
           </div>
         ) : (

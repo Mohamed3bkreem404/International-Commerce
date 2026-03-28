@@ -67,7 +67,7 @@
 
 @layer utilities {
   .glass-panel {
-    @apply border border-border/70 bg-card/78 shadow-soft backdrop-blur-xl;
+    @apply border border-border/70 bg-card/80 shadow-soft backdrop-blur-xl;
   }
 
   .surface-elevated {

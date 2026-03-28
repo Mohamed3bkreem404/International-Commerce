@@ -17,6 +17,7 @@ type ProductCardProps = {
 
 export function ProductCard({ product, onAddToCart, isAdding = false }: ProductCardProps) {
   const inStock = Number(product.stockQuantity) > 0;
+  const hasId = Boolean(product.id);
 
   return (
     <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
@@ -37,7 +38,7 @@ export function ProductCard({ product, onAddToCart, isAdding = false }: ProductC
         </CardContent>
         <CardFooter>
           <Button
-            disabled={!inStock || isAdding}
+            disabled={!inStock || isAdding || !hasId}
             className="w-full"
             onClick={() => onAddToCart(product.id)}
           >

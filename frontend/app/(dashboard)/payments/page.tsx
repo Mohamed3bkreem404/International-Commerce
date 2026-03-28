@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { startTransition, useDeferredValue, useMemo, useState } from "react";
 import { RefreshCcw, Search } from "lucide-react";
 
 import { PaymentCard } from "@/components/payment/payment-card";
@@ -20,15 +20,17 @@ export default function PaymentsPage() {
 
   const paymentByOrderQuery = usePaymentByOrderQuery(orderFilter);
 
+  const deferredSearchText = useDeferredValue(searchText);
+
   const listData = useMemo(() => {
     const payments = paymentsQuery.data || [];
-    if (!searchText.trim()) {
+    if (!deferredSearchText.trim()) {
       return payments;
     }
     return payments.filter((payment) =>
-      payment.orderId.toLowerCase().includes(searchText.toLowerCase()),
+      payment.orderId.toLowerCase().includes(deferredSearchText.toLowerCase()),
     );
-  }, [paymentsQuery.data, searchText]);
+  }, [paymentsQuery.data, deferredSearchText]);
 
   const showSingleOrderResult = Boolean(orderFilter);
 
@@ -53,7 +55,12 @@ export default function PaymentsPage() {
         <Input
           placeholder="Filter list by order id..."
           value={searchText}
-          onChange={(event) => setSearchText(event.target.value)}
+          onChange={(event) => {
+            const nextValue = event.target.value;
+            startTransition(() => {
+              setSearchText(nextValue);
+            });
+          }}
         />
         <div className="flex gap-2">
           <Input
@@ -99,8 +106,10 @@ export default function PaymentsPage() {
             )
           ) : listData.length ? (
             <div className="space-y-4">
-              {listData.map((payment) => (
-                <PaymentCard key={payment.paymentId} payment={payment} />
+              {listData.map((payment, idx) => (
+                <div key={payment.paymentId} className="animate-fade-up" style={{ animationDelay: `${idx * 55}ms` }}>
+                  <PaymentCard payment={payment} />
+                </div>
               ))}
             </div>
           ) : (
