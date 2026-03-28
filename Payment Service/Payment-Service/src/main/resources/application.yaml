@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: Payment-Service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/payment_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:4015}
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+server:
+  port: ${PORT:9005}
+jwt:
+  secret: ${JWT:32c01665f78c028b589634e3c4ea96a7718356ade9a6ecc34abf0c208adfa0ee}

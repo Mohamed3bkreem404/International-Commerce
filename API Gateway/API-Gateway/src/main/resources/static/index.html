@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Northstar Commerce</title>
+    <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<div class="ambient ambient-left"></div>
+<div class="ambient ambient-right"></div>
+
+<div class="page-shell">
+    <header class="topbar">
+        <div class="brand-block">
+            <div class="brand-mark">N</div>
+            <div>
+                <p class="eyebrow">Full Stack Commerce</p>
+                <h1 class="brand-title">Northstar Commerce</h1>
+            </div>
+        </div>
+
+        <div class="session-strip">
+            <div class="session-copy">
+                <span class="status-label">Current Session</span>
+                <strong id="session-user">Guest</strong>
+            </div>
+            <span id="session-role" class="status-chip">No token</span>
+            <button id="logout-btn" class="ghost-button" type="button">Logout</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-copy">
+            <p class="eyebrow">Gateway Frontend</p>
+            <h2>Browse, cart, checkout, and pay from one clean workspace.</h2>
+            <p class="hero-text">
+                This dashboard sits on top of your microservices through the API Gateway.
+                Create an account, sign in, add products to the cart, place orders, and complete a payment without touching Postman.
+            </p>
+
+            <div class="hero-actions">
+                <button id="refresh-all" type="button">Refresh All</button>
+                <span class="hero-note">Gateway root: <code>localhost:9000</code></span>
+            </div>
+        </div>
+
+        <div class="hero-aside">
+            <div class="hero-card">
+                <p class="panel-kicker">Overview</p>
+                <div class="metric-grid">
+                    <article class="metric-card">
+                        <span class="metric-label">Products</span>
+                        <strong id="metric-products">0</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Cart Total</span>
+                        <strong id="metric-cart-total">$0.00</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Orders</span>
+                        <strong id="metric-orders">0</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Paid Total</span>
+                        <strong id="metric-paid-total">$0.00</strong>
+                    </article>
+                </div>
+            </div>
+
+            <div class="hero-card compact">
+                <p class="panel-kicker">Flow</p>
+                <div class="flow-rail">
+                    <span>Auth</span>
+                    <span>Catalog</span>
+                    <span>Cart</span>
+                    <span>Order</span>
+                    <span>Payment</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="dashboard">
+        <section class="panel auth-panel">
+            <div class="panel-head">
+                <div>
+                    <p class="panel-kicker">Access</p>
+                    <h2>Account Desk</h2>
+                </div>
+                <p class="meta-text panel-note">
+                    Create a new user or log in with an existing one. The token is stored locally in the browser.
+                </p>
+            </div>
+
+            <div class="form-grid">
+                <form id="signup-form" class="form-card">
+                    <h3>Create Account</h3>
+                    <label>
+                        Username
+                        <input type="text" name="userName" placeholder="new user" required>
+                    </label>
+                    <label>
+                        Password
+                        <input type="password" name="password" placeholder="password" required>
+                    </label>
+                    <button type="submit">Sign Up</button>
+                </form>
+
+                <form id="login-form" class="form-card accent-card">
+                    <h3>Login</h3>
+                    <label>
+                        Username
+                        <input type="text" name="username" placeholder="username" required>
+                    </label>
+                    <label>
+                        Password
+                        <input type="password" name="password" placeholder="password" required>
+                    </label>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head inline-head">
+                <div>
+                    <p class="panel-kicker">Catalog</p>
+                    <h2>Products</h2>
+                </div>
+                <div class="button-row">
+                    <span id="product-count" class="soft-chip">0 items</span>
+                    <button id="refresh-products" class="ghost-button" type="button">Refresh</button>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <label class="search-field">
+                    <span class="field-label">Search Products</span>
+                    <input id="product-search" type="text" placeholder="Search by product name">
+                </label>
+                <label class="toggle-field">
+                    <input id="product-stock-toggle" type="checkbox">
+                    <span>Only show in-stock items</span>
+                </label>
+            </div>
+
+            <div id="products-grid" class="product-grid empty-state">
+                Login to load products.
+            </div>
+        </section>
+
+        <section class="commerce-grid">
+            <section class="panel cart-panel">
+                <div class="panel-head inline-head">
+                    <div>
+                        <p class="panel-kicker">Basket</p>
+                        <h2>Cart</h2>
+                    </div>
+                    <div class="button-row">
+                        <button id="refresh-cart" class="ghost-button" type="button">Refresh</button>
+                        <button id="clear-cart" class="ghost-button danger" type="button">Clear</button>
+                    </div>
+                </div>
+                <div id="cart-view" class="stack-list empty-state">
+                    Login to see your cart.
+                </div>
+            </section>
+
+            <aside class="panel checkout-panel">
+                <div class="panel-head">
+                    <div>
+                        <p class="panel-kicker">Order</p>
+                        <h2>Checkout</h2>
+                    </div>
+                </div>
+
+                <div class="checkout-summary">
+                    <span class="meta-text">Current cart total</span>
+                    <strong id="checkout-total">$0.00</strong>
+                </div>
+
+                <form id="checkout-form" class="form-card flat">
+                    <label>
+                        Shipping Address
+                        <input type="text" name="shippingAddress" placeholder="Cairo, Street 10">
+                    </label>
+                    <label>
+                        Notes
+                        <textarea name="notes" rows="4" placeholder="Doorbell not working"></textarea>
+                    </label>
+                    <button type="submit">Create Order</button>
+                </form>
+            </aside>
+        </section>
+
+        <section class="panel split-panel">
+            <div class="panel-column">
+                <div class="panel-head inline-head">
+                    <div>
+                        <p class="panel-kicker">Orders</p>
+                        <h2>My Orders</h2>
+                    </div>
+                    <div class="button-row">
+                        <span id="orders-count" class="soft-chip">0 orders</span>
+                        <button id="refresh-orders" class="ghost-button" type="button">Refresh</button>
+                    </div>
+                </div>
+                <div id="orders-view" class="stack-list empty-state">
+                    Orders will appear here.
+                </div>
+            </div>
+
+            <div class="panel-column">
+                <div class="panel-head inline-head">
+                    <div>
+                        <p class="panel-kicker">Payments</p>
+                        <h2>My Payments</h2>
+                    </div>
+                    <div class="button-row">
+                        <span id="payments-count" class="soft-chip">0 payments</span>
+                        <button id="refresh-payments" class="ghost-button" type="button">Refresh</button>
+                    </div>
+                </div>
+                <div id="payments-view" class="stack-list empty-state">
+                    Payments will appear here.
+                </div>
+            </div>
+        </section>
+
+        <section class="panel log-panel">
+            <div class="panel-head inline-head">
+                <div>
+                    <p class="panel-kicker">Activity</p>
+                    <h2>Live Console</h2>
+                </div>
+                <span class="meta-text">Latest actions and errors appear here</span>
+            </div>
+            <div id="activity-log" class="log-list"></div>
+        </section>
+    </main>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

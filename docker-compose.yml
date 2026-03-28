@@ -1,0 +1,227 @@
+
+services:
+  accounts_db:
+    image: postgres:15
+    container_name: accounts_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4015
+      POSTGRES_DB: accounts_db
+    volumes:
+      - accounts_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d accounts_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - ecommerce-net
+
+  products_db:
+    image: postgres:15
+    container_name: products_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4015
+      POSTGRES_DB: products_db
+    volumes:
+      - products_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d products_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - ecommerce-net
+
+  order_db:
+    image: postgres:15
+    container_name: order_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4015
+      POSTGRES_DB: order_db
+    volumes:
+      - order_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d order_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - ecommerce-net
+
+  cart_db:
+    image: postgres:15
+    container_name: cart_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4015
+      POSTGRES_DB: cart_db
+    volumes:
+      - cart_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cart_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - ecommerce-net
+
+  payment_db:
+    image: postgres:15
+    container_name: payment_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4015
+      POSTGRES_DB: payment_db
+    volumes:
+      - payment_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d payment_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - ecommerce-net
+
+  user-service:
+    build:
+      context: "./User Service/User-Service"
+    container_name: user-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://accounts_db:5432/accounts_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=4015
+      - PORT=9002
+    ports:
+      - "9002:9002"
+    depends_on:
+      accounts_db:
+        condition: service_healthy
+    networks:
+      - ecommerce-net
+
+  product-service:
+    build:
+      context: "./Product Service/Product-Service"
+    container_name: product-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://products_db:5432/products_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=4015
+      - PRODUCT_SERVICE_URL=http://product-service:9001
+      - PORT=9001
+    ports:
+      - "9001:9001"
+    depends_on:
+      products_db:
+        condition: service_healthy
+    networks:
+      - ecommerce-net
+
+  order-service:
+    build:
+      context: "./Order Service/Order-Service"
+    container_name: order-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://order_db:5432/order_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=4015
+      - CART_SERVICE_URL=http://cart-service:9003
+      - PORT=9004
+    ports:
+      - "9004:9004"
+    depends_on:
+      order_db:
+        condition: service_healthy
+    networks:
+      - ecommerce-net
+
+  payment-service:
+    build:
+      context: "./Payment Service/Payment-Service"
+    container_name: payment-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://payment_db:5432/payment_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=4015
+      - ORDER_SERVICE_URL=http://order-service:9004
+      - PORT=9005
+    ports:
+      - "9005:9005"
+    depends_on:
+      payment_db:
+        condition: service_healthy
+    networks:
+      - ecommerce-net
+
+  cart-service:
+    build:
+      context: "./Cart Service/Cart-Service"
+    container_name: cart-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://cart_db:5432/cart_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=4015
+      - PRODUCT_SERVICE_URL=http://product-service:9001
+      - PORT=9003
+    ports:
+      - "9003:9003"
+    depends_on:
+      cart_db:
+        condition: service_healthy
+    networks:
+      - ecommerce-net
+
+  api-gateway:
+    build:
+      context: "./API Gateway/API-Gateway"
+    container_name: api-gateway
+    environment:
+      - USER_SERVICE_URL=http://user-service:9002
+      - PRODUCT_SERVICE_URL=http://product-service:9001
+      - CART_SERVICE_URL=http://cart-service:9003
+      - ORDER_SERVICE_URL=http://order-service:9004
+      - PAYMENT_SERVICE_URL=http://payment-service:9005
+    ports:
+      - "9000:9000"
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+      - payment-service
+      - cart-service
+    networks:
+      - ecommerce-net
+
+  frontend:
+    build:
+      context: "./frontend"
+      args:
+        API_PROXY_TARGET: http://api-gateway:9000
+    container_name: frontend
+    environment:
+      - API_PROXY_TARGET=http://api-gateway:9000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+    networks:
+      - ecommerce-net
+
+networks:
+  ecommerce-net:
+    driver: bridge
+
+volumes:
+  accounts_data:
+  products_data:
+  order_data:
+  cart_data:
+  payment_data:

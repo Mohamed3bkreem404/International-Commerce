@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Annotation profile for Product-Service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+        </processorPath>
+        <module name="API-Gateway" />
+        <module name="Order-Service" />
+        <module name="Cart-Service" />
+        <module name="Product-Service" />
+        <module name="Payment-Service" />
+        <module name="User-Service" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="API-Gateway" options="-parameters" />
+      <module name="Cart-Service" options="-parameters" />
+      <module name="Order-Service" options="-parameters" />
+      <module name="Payment-Service" options="-parameters" />
+      <module name="Product-Service" options="-parameters" />
+      <module name="User-Service" options="-parameters" />
+    </option>
+  </component>
+</project>

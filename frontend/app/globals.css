@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 33% 98%;
+    --foreground: 222 34% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 34% 12%;
+    --primary: 220 78% 54%;
+    --primary-foreground: 214 100% 98%;
+    --secondary: 220 30% 95%;
+    --secondary-foreground: 222 34% 14%;
+    --muted: 218 24% 92%;
+    --muted-foreground: 219 12% 39%;
+    --accent: 187 73% 43%;
+    --accent-foreground: 190 100% 98%;
+    --border: 220 19% 86%;
+    --input: 220 19% 86%;
+    --ring: 220 78% 54%;
+  }
+
+  .dark {
+    --background: 222 32% 9%;
+    --foreground: 214 44% 95%;
+    --card: 222 26% 12%;
+    --card-foreground: 214 44% 95%;
+    --primary: 219 89% 64%;
+    --primary-foreground: 225 40% 10%;
+    --secondary: 219 20% 18%;
+    --secondary-foreground: 214 30% 92%;
+    --muted: 220 18% 16%;
+    --muted-foreground: 217 13% 68%;
+    --accent: 186 72% 52%;
+    --accent-foreground: 222 38% 9%;
+    --border: 218 19% 24%;
+    --input: 218 19% 24%;
+    --ring: 219 89% 64%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image:
+      radial-gradient(circle at 14% 8%, rgba(76, 122, 245, 0.19), transparent 34%),
+      radial-gradient(circle at 92% 16%, rgba(0, 188, 212, 0.14), transparent 35%),
+      linear-gradient(170deg, rgba(255, 255, 255, 0.92), rgba(241, 245, 253, 0.94));
+    min-height: 100vh;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(circle at 14% 8%, rgba(89, 126, 247, 0.21), transparent 36%),
+      radial-gradient(circle at 92% 16%, rgba(0, 210, 232, 0.12), transparent 35%),
+      linear-gradient(170deg, rgba(9, 12, 20, 0.95), rgba(14, 18, 28, 0.98));
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.25);
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply border border-border/70 bg-card/78 shadow-soft backdrop-blur-xl;
+  }
+
+  .surface-elevated {
+    @apply border border-border/70 bg-card/85 shadow-premium backdrop-blur-xl;
+  }
+
+  .gradient-text {
+    background: linear-gradient(120deg, hsl(var(--primary)), hsl(var(--accent)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .animate-float {
+    animation: float 5s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+}
