@@ -20,6 +20,8 @@ export function CartItemCard({
   onRemove,
   disabled = false,
 }: CartItemCardProps) {
+  const hasValidProductId = Boolean(item.productId?.trim());
+
   return (
     <Card className="overflow-hidden">
       <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
@@ -29,6 +31,11 @@ export function CartItemCard({
             {toCurrency(item.price)} each
           </p>
           <p className="mt-1 text-sm font-medium text-primary">{toCurrency(item.subtotal)} subtotal</p>
+          {!hasValidProductId ? (
+            <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+              Product identifier is missing for this item.
+            </p>
+          ) : null}
         </div>
 
         <div className="rounded-2xl border border-border/70 bg-secondary/25 p-1">
@@ -36,7 +43,7 @@ export function CartItemCard({
           <Button
             variant="outline"
             size="icon"
-            disabled={disabled || item.quantity <= 1}
+            disabled={disabled || item.quantity <= 1 || !hasValidProductId}
             onClick={() => onDecrement(item.productId, item.quantity - 1)}
           >
             <Minus className="h-4 w-4" />
@@ -45,7 +52,7 @@ export function CartItemCard({
           <Button
             variant="outline"
             size="icon"
-            disabled={disabled}
+            disabled={disabled || !hasValidProductId}
             onClick={() => onIncrement(item.productId, item.quantity + 1)}
           >
             <Plus className="h-4 w-4" />
@@ -53,7 +60,7 @@ export function CartItemCard({
           <Button
             variant="destructive"
             size="icon"
-            disabled={disabled}
+            disabled={disabled || !hasValidProductId}
             onClick={() => onRemove(item.productId)}
           >
             <Trash2 className="h-4 w-4" />

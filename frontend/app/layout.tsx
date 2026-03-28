@@ -17,9 +17,25 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: BRAND_NAME,
+  title: {
+    default: BRAND_NAME,
+    template: `%s | ${BRAND_NAME}`,
+  },
   description:
     "International Commerce is a premium e-commerce frontend powered by a microservices backend.",
+  applicationName: BRAND_NAME,
+  openGraph: {
+    title: BRAND_NAME,
+    description:
+      "International Commerce is a premium e-commerce frontend powered by a microservices backend.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: BRAND_NAME,
+    description:
+      "International Commerce is a premium e-commerce frontend powered by a microservices backend.",
+  },
 };
 
 export default function RootLayout({

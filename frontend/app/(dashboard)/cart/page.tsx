@@ -32,6 +32,10 @@ export default function CartPage() {
   const cart = cartQuery.data;
 
   const updateQty = async (productId: string, quantity: number) => {
+    if (!productId?.trim()) {
+      toast.error("Product id is missing for this item. Please refresh cart.");
+      return;
+    }
     if (quantity < 1) {
       return;
     }
@@ -44,6 +48,10 @@ export default function CartPage() {
   };
 
   const removeItem = async (productId: string) => {
+    if (!productId?.trim()) {
+      toast.error("Product id is missing for this item. Please refresh cart.");
+      return;
+    }
     try {
       await removeMutation.mutateAsync(productId);
       toast.success("Item removed.");

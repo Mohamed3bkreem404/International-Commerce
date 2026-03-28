@@ -40,6 +40,9 @@ Default client base URL is `/api`, proxied by Next.js to `API_PROXY_TARGET` (def
 - `app/` routes and layouts
 - `components/` reusable UI and feature blocks
 - `hooks/` query and mutation hooks
+- `lib/api-routes.ts` centralized API endpoint map
+- `lib/query-keys.ts` normalized TanStack Query keys
+- `lib/normalizers/` defensive DTO normalization layer
 - `lib/` infrastructure helpers (axios, errors, utils)
 - `services/` API service modules
 - `store/` Zustand stores

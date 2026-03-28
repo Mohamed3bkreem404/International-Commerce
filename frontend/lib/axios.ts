@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 
 import { ApiClientError } from "@/lib/api-error";
-import { AUTH_TOKEN_KEY } from "@/lib/constants";
+import { API_BASE_URL, AUTH_TOKEN_KEY } from "@/lib/constants";
 import { type ApiResponse } from "@/types/api";
 
 type MaybeWrappedError = ApiResponse<unknown> | undefined;
@@ -15,9 +15,10 @@ export const api = axios.create({
 api.interceptors.request.use((config) => {
   if (config.url && !/^https?:\/\//i.test(config.url)) {
     // Keep all service calls absolute from host root to avoid nested-route URLs.
-    if (!config.url.startsWith("/")) {
-      config.url = `/${config.url}`;
-    }
+    const normalizedPath = config.url.startsWith("/") ? config.url : `/${config.url}`;
+    config.url = normalizedPath.startsWith("/api/")
+      ? normalizedPath
+      : `${API_BASE_URL}${normalizedPath}`;
     config.baseURL = "";
   }
 

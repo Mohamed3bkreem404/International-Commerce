@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
+import { queryKeys } from "@/lib/query-keys";
 import {
   addCartItem,
   clearCart,
@@ -12,14 +13,12 @@ import {
 } from "@/services/cart.service";
 import { useCartStore } from "@/store/cart-store";
 
-export const cartKeys = {
-  current: ["cart"] as const,
-};
+export const cartKeys = queryKeys.cart;
 
 export function useCartQuery() {
   const setCartCount = useCartStore((state) => state.setCartCount);
   const query = useQuery({
-    queryKey: cartKeys.current,
+    queryKey: queryKeys.cart.current,
     queryFn: getMyCart,
   });
 
@@ -36,7 +35,7 @@ export function useAddCartItemMutation() {
   return useMutation({
     mutationFn: addCartItem,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: cartKeys.current });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.cart.current });
     },
   });
 }
@@ -47,7 +46,7 @@ export function useUpdateCartItemMutation() {
     mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) =>
       updateCartItem(productId, { quantity }),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: cartKeys.current });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.cart.current });
     },
   });
 }
@@ -57,7 +56,7 @@ export function useRemoveCartItemMutation() {
   return useMutation({
     mutationFn: removeCartItem,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: cartKeys.current });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.cart.current });
     },
   });
 }
@@ -70,7 +69,7 @@ export function useClearCartMutation() {
     mutationFn: clearCart,
     onSuccess: () => {
       clearCartCount();
-      void queryClient.invalidateQueries({ queryKey: cartKeys.current });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.cart.current });
     },
   });
 }
