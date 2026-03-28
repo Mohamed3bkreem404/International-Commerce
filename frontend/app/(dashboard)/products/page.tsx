@@ -12,7 +12,7 @@ import { ProductGridSkeleton } from "@/components/states/skeleton-loaders";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useApiError } from "@/hooks/use-api-error";
-import { useAddCartItemMutation } from "@/hooks/use-cart";
+import { useAddCartItemMutation, useCartQuery } from "@/hooks/use-cart";
 import { useProductsQuery } from "@/hooks/use-products";
 
 export default function ProductsPage() {
@@ -21,19 +21,51 @@ export default function ProductsPage() {
   const [inStockOnly, setInStockOnly] = useState(false);
 
   const productsQuery = useProductsQuery();
+  const cartQuery = useCartQuery();
   const addToCartMutation = useAddCartItemMutation();
 
   const deferredQuery = useDeferredValue(query);
+  const quantitiesByProductId = useMemo(() => {
+    const cartItems = cartQuery.data?.items || [];
+    return cartItems.reduce(
+      (acc, item) => {
+        const normalizedProductId = item.productId?.trim();
+        if (!normalizedProductId) {
+          return acc;
+        }
+        acc[normalizedProductId] = (acc[normalizedProductId] ?? 0) + Number(item.quantity || 0);
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+  }, [cartQuery.data?.items]);
+
+  const remainingStockByProductId = useMemo(() => {
+    const products = productsQuery.data || [];
+    return products.reduce(
+      (acc, product) => {
+        const normalizedProductId = product.id?.trim();
+        if (!normalizedProductId) {
+          return acc;
+        }
+        const reserved = quantitiesByProductId[normalizedProductId] ?? 0;
+        acc[normalizedProductId] = Math.max(0, Number(product.stockQuantity) - reserved);
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+  }, [productsQuery.data, quantitiesByProductId]);
+
   const filteredProducts = useMemo(() => {
     const products = productsQuery.data || [];
     return products.filter((product) => {
       const matchesText =
         !deferredQuery ||
         product.name.toLowerCase().includes(deferredQuery.toLowerCase());
-      const matchesStock = !inStockOnly || Number(product.stockQuantity) > 0;
+      const matchesStock = !inStockOnly || (remainingStockByProductId[product.id?.trim()] ?? 0) > 0;
       return matchesText && matchesStock;
     });
-  }, [productsQuery.data, deferredQuery, inStockOnly]);
+  }, [productsQuery.data, deferredQuery, inStockOnly, remainingStockByProductId]);
 
   const onAddToCart = async (productId: string) => {
     if (!productId?.trim()) {
@@ -104,7 +136,12 @@ export default function ProductsPage() {
           <article>
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Ready stock</p>
             <p className="mt-1 font-display text-3xl">
-              {(productsQuery.data || []).filter((product) => Number(product.stockQuantity) > 0).length}
+              {(productsQuery.data || []).filter((product) => {
+                const normalizedProductId = product.id?.trim();
+                return normalizedProductId
+                  ? (remainingStockByProductId[normalizedProductId] ?? 0) > 0
+                  : false;
+              }).length}
             </p>
           </article>
         </div>
@@ -128,6 +165,8 @@ export default function ProductsPage() {
                   product={product}
                   onAddToCart={onAddToCart}
                   isAdding={addToCartMutation.isPending}
+                  remainingStock={remainingStockByProductId[product.id?.trim()] ?? 0}
+                  inCartQuantity={quantitiesByProductId[product.id?.trim()] ?? 0}
                 />
               </div>
             ))}
