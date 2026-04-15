@@ -68,7 +68,13 @@ public class    GlobalExceptionHandler {
                 new GlobalResponse.ErrorItem(cr.getMessage())
 
         );
-        return new ResponseEntity<>(new GlobalResponse<>(errors), HttpStatus.NOT_FOUND);
+        HttpStatus status;
+        try {
+            status = HttpStatus.valueOf(cr.getCode());
+        } catch (IllegalArgumentException ex) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<>(new GlobalResponse<>(errors), status);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -90,4 +96,3 @@ public class    GlobalExceptionHandler {
     //ObjectOptimisticLockingFailureException
 
 }
-

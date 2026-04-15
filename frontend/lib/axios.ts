@@ -13,16 +13,21 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  let requestPath = config.url || "";
+
   if (config.url && !/^https?:\/\//i.test(config.url)) {
     // Keep all service calls absolute from host root to avoid nested-route URLs.
     const normalizedPath = config.url.startsWith("/") ? config.url : `/${config.url}`;
-    config.url = normalizedPath.startsWith("/api/")
+    requestPath = normalizedPath.startsWith("/api/")
       ? normalizedPath
       : `${API_BASE_URL}${normalizedPath}`;
+    config.url = requestPath;
     config.baseURL = "";
   }
 
-  if (typeof window !== "undefined") {
+  const isAuthRequest = /^\/api\/v1\/auth(?:\/|$)/.test(requestPath);
+
+  if (typeof window !== "undefined" && !isAuthRequest) {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

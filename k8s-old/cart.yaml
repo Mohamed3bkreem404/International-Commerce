@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart
+  template:
+    metadata:
+      labels:
+        app: cart
+    spec:
+      containers:
+        - name: cart
+          image: ineutrono/ecm-cart-service
+          ports:
+            - containerPort: 9003
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://cart-db:5432/cart_db
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "4015"
+            - name: PRODUCT_SERVICE_URL
+              value: http://product-service:9001
+            - name: PORT
+              value: "9003"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-service
+spec:
+  selector:
+    app: cart
+  ports:
+    - port: 9003
+      targetPort: 9003
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart-db
+  template:
+    metadata:
+      labels:
+        app: cart-db
+    spec:
+      containers:
+        - name: cart-db
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: "4015"
+            - name: POSTGRES_DB
+              value: cart_db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-db
+spec:
+  selector:
+    app: cart-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP

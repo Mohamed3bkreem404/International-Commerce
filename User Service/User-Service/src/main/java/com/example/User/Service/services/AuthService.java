@@ -8,6 +8,7 @@ import com.example.User.Service.entities.UserAccount;
 import com.example.User.Service.exception.CustomerResponseException;
 import com.example.User.Service.repositories.UserAccountRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,13 +43,17 @@ public class AuthService {
     }
 
     public String logIn(LogInRequest logIn) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        logIn.username(),
-                        logIn.password()
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            logIn.username(),
+                            logIn.password()
+                    )
+            );
+        } catch (AuthenticationException ex) {
+            throw CustomerResponseException.BadCredntinals();
+        }
 
-                )
-        );
         //jwtHelper.generateToken();
         UserAccount userAccount = userAccountRepo.findByUserName(logIn.username())
                 .orElseThrow(CustomerResponseException::BadCredntinals);

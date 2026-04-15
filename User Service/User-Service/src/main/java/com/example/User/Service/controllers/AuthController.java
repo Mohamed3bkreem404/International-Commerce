@@ -22,7 +22,7 @@ public class AuthController {
     private AuthService authService;
 
 
-    @PostMapping("/signUp")
+    @PostMapping({"/signUp", "/signup"})
     public ResponseEntity<GlobalResponse<?>> signUp(
             @Validated
             @RequestBody SignUpRequest sign

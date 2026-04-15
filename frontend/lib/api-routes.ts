@@ -6,7 +6,7 @@ function encodePathSegment(value: string) {
 
 export const API_ROUTES = {
   auth: {
-    signUp: `${API_VERSION_PREFIX}/auth/signUp`,
+    signUp: `${API_VERSION_PREFIX}/auth/signup`,
     login: `${API_VERSION_PREFIX}/auth/login`,
   },
   products: {

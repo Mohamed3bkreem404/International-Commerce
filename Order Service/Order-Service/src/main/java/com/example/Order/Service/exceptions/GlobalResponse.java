@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -13,8 +14,11 @@ import java.util.List;
 @NoArgsConstructor
 public class GlobalResponse<T> {
 
+
+
     private static final String SUCCESS = "Success";
     private static final String ERROR = "Error";
+
 
     private String status;
     private T data;
