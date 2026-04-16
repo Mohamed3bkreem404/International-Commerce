@@ -5,6 +5,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
+    - ##fan out ingress x)
     - host: international-commerce
       http:
         paths:
