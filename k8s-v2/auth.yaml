@@ -101,7 +101,7 @@ spec:
     spec:
       containers:
         - name: user
-          image: ecm-user-service:latest
+          image: ineutrono/ecm-user-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9002
