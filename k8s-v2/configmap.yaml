@@ -35,6 +35,6 @@ data:
   API_CART_SERVICE_URL: http://cart-service:9003
   API_ORDER_SERVICE_URL: http://order-service:9004
   API_PAYMENT_SERVICE_URL: http://payment-service:9005
-  API_ALLOWED_ORIGIN_PATTERNS: "http://localhost:3000,http://192.168.49.2:30090"
+  API_ALLOWED_ORIGIN_PATTERNS: "http://192.168.49.2:30090 , http://international-commerce/ "
 
   FRONTEND_API_PROXY_TARGET: http://api-gateway:9000

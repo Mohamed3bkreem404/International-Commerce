@@ -12,3 +12,4 @@ resources:
   - payment.yaml
   - api.yaml
   - frontend.yaml
+  - ingress.yaml
