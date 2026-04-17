@@ -21,7 +21,10 @@ spec:
             - containerPort: 3000
           env:
             - name: API_PROXY_TARGET
-              value: http://api-gateway:9000
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-config
+                  key: FRONTEND_API_PROXY_TARGET
           resources:
             requests:
               cpu: 100m

@@ -42,7 +42,10 @@ spec:
                   name: ecommerce-secrets
                   key: DB_PASSWORD
             - name: POSTGRES_DB
-              value: order_db
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-config
+                  key: ORDER_POSTGRES_DB
           volumeMounts:
             - name: order-db-storage
               mountPath: /var/lib/postgresql/data
@@ -104,7 +107,10 @@ spec:
             - containerPort: 9004
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://order-db:5432/order_db
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-config
+                  key: ORDER_SPRING_DATASOURCE_URL
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -116,14 +122,20 @@ spec:
                   name: ecommerce-secrets
                   key: DB_PASSWORD
             - name: CART_SERVICE_URL
-              value: http://cart-service:9003
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-config
+                  key: ORDER_CART_SERVICE_URL
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: ecommerce-secrets
                   key: JWT_SECRET
             - name: PORT
-              value: "9004"
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-config
+                  key: ORDER_PORT
           resources:
             requests:
               cpu: 100m

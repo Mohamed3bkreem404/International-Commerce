@@ -21,17 +21,35 @@ spec:
             - containerPort: 9000
           env:
             - name: USER_SERVICE_URL
-              value: http://user-service:9002
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-config
+                  key: API_USER_SERVICE_URL
             - name: PRODUCT_SERVICE_URL
-              value: http://product-service:9001
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-config
+                  key: API_PRODUCT_SERVICE_URL
             - name: CART_SERVICE_URL
-              value: http://cart-service:9003
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-config
+                  key: API_CART_SERVICE_URL
             - name: ORDER_SERVICE_URL
-              value: http://order-service:9004
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-config
+                  key: API_ORDER_SERVICE_URL
             - name: PAYMENT_SERVICE_URL
-              value: http://payment-service:9005
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-config
+                  key: API_PAYMENT_SERVICE_URL
             - name: ALLOWED_ORIGIN_PATTERNS
-              value: "*"
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-config
+                  key: API_ALLOWED_ORIGIN_PATTERNS
           resources:
             requests:
               cpu: 100m
