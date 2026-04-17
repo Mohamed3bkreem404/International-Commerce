@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: ineutrono/eecm-api-service:latest
+          image: ineutrono/ecm-api-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9000
