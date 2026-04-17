@@ -4,7 +4,7 @@ metadata:
   name: ecommerce-ingress
   namespace: ecommerce-v2
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   rules:
     - http:
         paths:
@@ -15,7 +15,7 @@ spec:
                 name: api-gateway
                 port:
                   number: 9000
-          - path: /international-commerce
+          - path: /
             pathType: Prefix
             backend:
               service:
