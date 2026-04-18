@@ -9,24 +9,28 @@ data:
   CART_POSTGRES_DB: cart_db
   ORDER_POSTGRES_DB: order_db
   PAYMENT_POSTGRES_DB: payment_db
+  DB_HOST: "international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com"
+  DB_PORT: "5432"
 
-  USER_SPRING_DATASOURCE_URL: jdbc:postgresql://accounts-db:5432/accounts_db
+
+
+  USER_SPRING_DATASOURCE_URL: jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/accounts_db
   USER_PORT: "9002"
 
-  PRODUCT_SPRING_DATASOURCE_URL: jdbc:postgresql://products-db:5432/products_db
+  PRODUCT_SPRING_DATASOURCE_URL: jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/products_db
   PRODUCT_REDIS_HOST: redis
   PRODUCT_REDIS_PORT: "6379"
   PRODUCT_PORT: "9001"
 
-  CART_SPRING_DATASOURCE_URL: jdbc:postgresql://cart-db:5432/cart_db
+  CART_SPRING_DATASOURCE_URL: jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/cart_db
   CART_PRODUCT_SERVICE_URL: http://product-service:9001
   CART_PORT: "9003"
 
-  ORDER_SPRING_DATASOURCE_URL: jdbc:postgresql://order-db:5432/order_db
+  ORDER_SPRING_DATASOURCE_URL: jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/order_db
   ORDER_CART_SERVICE_URL: http://cart-service:9003
   ORDER_PORT: "9004"
 
-  PAYMENT_SPRING_DATASOURCE_URL: jdbc:postgresql://payment-db:5432/payment_db
+  PAYMENT_SPRING_DATASOURCE_URL: jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/payment_db
   PAYMENT_ORDER_SERVICE_URL: http://order-service:9004
   PAYMENT_PORT: "9005"
 
