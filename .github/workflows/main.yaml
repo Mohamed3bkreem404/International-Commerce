@@ -21,7 +21,7 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean package -DskipTests
-        working-directory: ./api-gateway
+        working-directory: ./API-Gateway
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
