@@ -8,3 +8,5 @@
 /dataSources.local.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+#k8s secrets
+k8s-v2/secrets.yaml
