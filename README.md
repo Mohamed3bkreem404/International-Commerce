@@ -1,3 +1,5 @@
+mermaid
+```
 graph TD
     %% Client Tier
     Client[📱 Next.js 14 Frontend]
@@ -76,3 +78,5 @@ graph TD
     class ALB aws;
     class Gateway,Auth,Product,Cart,Order,Payment microservice;
     class DB_Auth,DB_Prod,DB_Cart,DB_Order,DB_Pay database;
+
+```
