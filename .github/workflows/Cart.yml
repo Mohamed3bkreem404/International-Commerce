@@ -31,7 +31,7 @@ jobs:
 
       - name: build and push docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-cart-service:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-cart-service:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-cart-service:latest
         working-directory: Cart Service/Cart-Service
 
