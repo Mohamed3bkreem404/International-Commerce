@@ -42,4 +42,4 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo kubectl rollout restart deployment/api-gateway -n ecommerce-v2
+            sudo kubectl rollout restart deployment/api-gateway-deployment -n ecommerce-v2
