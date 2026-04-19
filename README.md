@@ -1,5 +1,5 @@
-mermaid
-```
+
+``` mermaid
 graph TD
     %% Client Tier
     Client[📱 Next.js 14 Frontend]
