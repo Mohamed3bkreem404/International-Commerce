@@ -42,7 +42,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo cd /home/ubuntu/Internationa-Commerce
+            sudo cd /home/ubuntu/International-Commerce
             git pull origin main
             sudo kubectl apply -k k8s-v2/ -n ecommerce-v2
             sudo kubectl rollout restart deployment/api-gateway-deployment -n ecommerce-v2

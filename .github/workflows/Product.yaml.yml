@@ -1,4 +1,4 @@
-name: Deploy cart Service
+name: Deploy product Service
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
 
       - name: Build with maven
         run: mvn clean package -DskipTests
-        working-directory: Cart Service/Cart-Service
+        working-directory: Product Service/product-Service
 
       - name: login to docker hub
         uses: docker/login-action@v2
@@ -31,9 +31,9 @@ jobs:
 
       - name: build and push docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-cart-service:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-cart-service:latest
-        working-directory: Cart Service/Cart-Service
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-product-service:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-product-service:latest
+        working-directory: Product Service/product-Service
 
       - name: deploy to k8s via ssh
         uses: appleboy/ssh-action@master
@@ -45,4 +45,4 @@ jobs:
             sudo cd /home/ubuntu/International-Commerce
             git pull origin main
             sudo kubectl apply -k k8s-v2/ -n ecommerce-v2
-            sudo kubectl rollout restart deployment/cart-deployment -n ecommerce-v2
+            sudo kubectl rollout restart deployment/product-deployment -n ecommerce-v2
