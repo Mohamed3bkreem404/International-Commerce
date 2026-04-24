@@ -21,7 +21,7 @@ jobs:
 
       - name: Build with maven
         run: mvn clean package -DskipTests
-        working-directory: Payment Service/payment-Service
+        working-directory: Payment Service/Payment-Service
 
       - name: login to docker hub
         uses: docker/login-action@v2
@@ -33,7 +33,7 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-payment-service:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-payment-service:latest
-        working-directory: Payment Service/payment-Service
+        working-directory: Payment Service/Payment-Service
 
       - name: deploy to k8s via ssh
         uses: appleboy/ssh-action@master

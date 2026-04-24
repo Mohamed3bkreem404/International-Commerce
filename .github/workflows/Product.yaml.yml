@@ -21,7 +21,7 @@ jobs:
 
       - name: Build with maven
         run: mvn clean package -DskipTests
-        working-directory: Product Service/product-Service
+        working-directory: Product Service/Product-Service
 
       - name: login to docker hub
         uses: docker/login-action@v2
@@ -33,7 +33,7 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-product-service:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-product-service:latest
-        working-directory: Product Service/product-Service
+        working-directory: Product Service/Product-Service
 
       - name: deploy to k8s via ssh
         uses: appleboy/ssh-action@master
