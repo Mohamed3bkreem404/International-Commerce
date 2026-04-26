@@ -32,11 +32,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth
 
+                            .requestMatchers("/actuator/**").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/v1/cart/**").hasAnyRole("USER", "ADMIN")
                             .requestMatchers(HttpMethod.DELETE, "/api/v1/cart/**").hasAnyRole("USER", "ADMIN")
                             .requestMatchers(HttpMethod.GET, "/api/v1/cart/**").hasAnyRole("USER", "ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/api/v1/cart/**").hasAnyRole("USER", "ADMIN")
-                            .requestMatchers("/actutator/**").permitAll()
 
                             .anyRequest().authenticated();
 
