@@ -4,3 +4,10 @@ metadata:
   name: ecommerce-v2
   labels:
     app.kubernetes.io/name: ecommerce-v2
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+  labels:
+    app.kubernetes.io/name: monitoring
