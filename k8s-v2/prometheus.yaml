@@ -17,7 +17,7 @@ spec:
         - name: prometheus
           image: prom/prometheus
           args:
-            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--config.file=/etc/prometheus/prometheus.yaml"
           ports:
             - containerPort: 9090
           volumeMounts:
