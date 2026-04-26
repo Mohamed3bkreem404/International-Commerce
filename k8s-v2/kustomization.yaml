@@ -11,3 +11,6 @@ resources:
   - payment.yaml
   - api.yaml
   - frontend.yaml
+  - prometheus.yaml
+  - prometheusConfigMap.yaml
+  - grafana.yaml
