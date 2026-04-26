@@ -13,25 +13,25 @@ data:
       - job_name: 'cart-service'
         metrics_path: /actutator/prometheus
         static_configs:
-          - targets: ['cart-service:9003']
+          - targets: ['cart-service.ecommerce-v2.svc.cluster.local:9003']
             
       - job_name: 'order-service'
         metrics_path: /actutator/prometheus
         static_configs:
-          - targets: ['order-service:9004']
+          - targets: ['order-service.ecommerce-v2.svc.cluster.local::9004']
             
       - job_name: 'payment-service'
         metrics_path: /actutator/prometheus
         static_configs:
-        - targets: ['payment-service:9005']
+        - targets: ['payment-service.ecommerce-v2.svc.cluster.local::9005']
           
       - job_name: 'product-service'
         metrics_path: /actutator/prometheus
         static_configs:
-          - targets: ['product-service:9001']
+          - targets: ['product-service.ecommerce-v2.svc.cluster.local::9001']
             
       - job_name: 'user-service'
         metrics_path: /actutator/prometheus
         static_configs:
-          - targets: ['user-service:9002']
+          - targets: ['user-service.ecommerce-v2.svc.cluster.local::9002']
             
