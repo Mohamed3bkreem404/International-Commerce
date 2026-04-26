@@ -36,6 +36,7 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.DELETE, "/api/v1/cart/**").hasAnyRole("USER", "ADMIN")
                             .requestMatchers(HttpMethod.GET, "/api/v1/cart/**").hasAnyRole("USER", "ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/api/v1/cart/**").hasAnyRole("USER", "ADMIN")
+                            .requestMatchers("/actutator/**").permitAll()
 
                             .anyRequest().authenticated();
 

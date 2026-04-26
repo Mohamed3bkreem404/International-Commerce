@@ -32,6 +32,7 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyRole("USER", "ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/api/v1/orders/**").hasAnyRole("USER", "ADMIN")
                             .requestMatchers(HttpMethod.DELETE, "/api/v1/orders/**").hasAnyRole("USER", "ADMIN")
+                            .requestMatchers("/actutator/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 .csrf(AbstractHttpConfigurer::disable)
