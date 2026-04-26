@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - configmap.yaml
-  - secrets.yaml
   - redis.yaml
   - auth.yaml
   - product.yaml
