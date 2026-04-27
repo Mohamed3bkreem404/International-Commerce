@@ -92,6 +92,10 @@ kind: Service
 metadata:
   name: payment-service
   namespace: ecommerce-v2
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/actuator/prometheus"
+    prometheus.io/port: "9002"
 spec:
   selector:
     app: payment

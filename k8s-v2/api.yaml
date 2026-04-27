@@ -79,6 +79,10 @@ kind: Service
 metadata:
   name: api-gateway
   namespace: ecommerce-v2
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/actuator/prometheus"
+    prometheus.io/port: "9002"
 spec:
   selector:
     app: api-gateway
