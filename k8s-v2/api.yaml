@@ -82,7 +82,7 @@ metadata:
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/path: "/actuator/prometheus"
-    prometheus.io/port: "9002"
+    prometheus.io/port: "9000"
 spec:
   selector:
     app: api-gateway

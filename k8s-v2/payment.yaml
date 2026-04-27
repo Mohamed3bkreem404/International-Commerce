@@ -95,7 +95,7 @@ metadata:
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/path: "/actuator/prometheus"
-    prometheus.io/port: "9002"
+    prometheus.io/port: "9005"
 spec:
   selector:
     app: payment
