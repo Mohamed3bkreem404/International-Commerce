@@ -87,7 +87,7 @@ kind: Service
 metadata:
   name: user-service
   namespace: ecommerce-v2
-  
+
 spec:
   selector:
     app: user
