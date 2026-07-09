@@ -1,7 +1,7 @@
 name: Deploy Front
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
 
 jobs:
   build-and-deploy:
@@ -25,14 +25,14 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-frontend-service:latest
         working-directory: frontend
 
-      - name: Deploy to K8s via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /home/ubuntu/International-Commerce
-            git pull origin main
-            sudo kubectl apply -k k8s-v2/ -n ecommerce-v2
-            sudo kubectl rollout restart deployment/frontend-deployment -n ecommerce-v2
+#      - name: Deploy to K8s via SSH
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ${{ secrets.EC2_USER }}
+#          key: ${{ secrets.EC2_SSH_KEY }}
+#          script: |
+#            cd /home/ubuntu/International-Commerce
+#            git pull origin main
+#            sudo kubectl apply -k k8s-v2/ -n ecommerce-v2
+#            sudo kubectl rollout restart deployment/frontend-deployment -n ecommerce-v2

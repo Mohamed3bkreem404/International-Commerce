@@ -1,0 +1,93 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/targets:/etc/prometheus/targets
+    networks:
+      - monitoring-net
+      - ecommerce-net
+    restart: unless-stopped
+
+
+  postgres-exporter-accounts:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter-accounts
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:4015@accounts_db:5432/accounts_db?sslmode=disable"
+    ports:
+      - "9181:9187"
+    networks:
+      - monitoring-net
+      - user-db
+    depends_on:
+      accounts_db:
+        condition: service_healthy
+
+
+  postgres-exporter-products:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter-products
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:4015@products_db:5432/products_db?sslmode=disable"
+    ports:
+      - "9182:9187"
+    networks:
+      - monitoring-net
+      - product-db
+    depends_on:
+      products_db:
+        condition: service_healthy
+
+
+  postgres-exporter-orders:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter-orders
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:4015@order_db:5432/order_db?sslmode=disable"
+    ports:
+      - "9183:9187"
+    networks:
+      - monitoring-net
+      - order-db
+    depends_on:
+      order_db:
+        condition: service_healthy
+
+
+  postgres-exporter-cart:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter-cart
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:4015@cart_db:5432/cart_db?sslmode=disable"
+    ports:
+      - "9184:9187"
+    networks:
+      - monitoring-net
+      - cart-db
+    depends_on:
+      cart_db:
+        condition: service_healthy
+
+
+  postgres-exporter-payment:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter-payment
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:4015@payment_db:5432/payment_db?sslmode=disable"
+    ports:
+      - "9185:9187"
+    networks:
+      - monitoring-net
+      - payment-db
+    depends_on:
+      payment_db:
+        condition: service_healthy
+
+networks:
+  ecommerce-net:
+    #same app network
+    external: true
