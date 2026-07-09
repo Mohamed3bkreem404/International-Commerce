@@ -16,7 +16,11 @@ services:
       retries: 10
       start_period: 5s
     networks:
-      - ecommerce-net
+      - user-db
+    cpus: '.1'
+    mem_limit: 70m
+    restart: unless-stopped
+
 
   products_db:
     image: postgres:15
@@ -34,7 +38,10 @@ services:
       retries: 10
       start_period: 10s
     networks:
-      - ecommerce-net
+      - product-db
+    cpus: '.1'
+    mem_limit: 70m
+    restart: unless-stopped
 
   order_db:
     image: postgres:15
@@ -52,7 +59,10 @@ services:
       retries: 10
       start_period: 10s
     networks:
-      - ecommerce-net
+      - order-db
+    cpus: '.1'
+    mem_limit: 70m
+    restart: unless-stopped
 
   cart_db:
     image: postgres:15
@@ -70,7 +80,10 @@ services:
       retries: 10
       start_period: 10s
     networks:
-      - ecommerce-net
+      - cart-db
+    cpus: '.1'
+    mem_limit: 70m
+    restart: unless-stopped
 
   payment_db:
     image: postgres:15
@@ -88,7 +101,10 @@ services:
       retries: 10
       start_period: 10s
     networks:
-      - ecommerce-net
+      - payment-db
+    cpus: '.1'
+    mem_limit: 70m
+    restart: unless-stopped
 
   user-service:
     image: ineutrono/ecm-user-service
@@ -105,6 +121,16 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
+      - user-db
+    cpus: '.5'
+    mem_limit: 700m
+    restart: on-failure:3
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:9002/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   product-service:
     image: ineutrono/ecm-product-service
@@ -121,6 +147,16 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
+      - product-db
+    cpus: '.5'
+    mem_limit: 700m
+    restart: on-failure:3
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:9001/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   order-service:
     image: ineutrono/ecm-order-service
@@ -137,6 +173,16 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
+      - order-db
+    cpus: '.5'
+    mem_limit: 700m
+    restart: on-failure:3
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:9004/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   payment-service:
     image: ineutrono/ecm-payment-service
@@ -153,6 +199,16 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
+      - payment-db
+    cpus: '.5'
+    mem_limit: 700m
+    restart: on-failure:3
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:9005/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   cart-service:
     image: ineutrono/ecm-cart-service
@@ -169,6 +225,16 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
+      - cart-db
+    cpus: '.5'
+    mem_limit: 700m
+    restart: on-failure:3
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:9003/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   api-gateway:
     image: ineutrono/ecm-api-service
@@ -181,13 +247,31 @@ services:
     ports:
       - "9000:9000"
     depends_on:
-      - user-service
-      - product-service
-      - order-service
-      - payment-service
-      - cart-service
+      user-service:
+        condition: service_healthy
+
+      product-service:
+        condition: service_healthy
+
+      order-service:
+        condition: service_healthy
+
+      payment-service:
+        condition: service_healthy
+
+      cart-service:
+        condition: service_healthy
     networks:
       - ecommerce-net
+    cpus: '.1'
+    mem_limit: 400m
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:9000/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   frontend:
     image: ineutrono/ecm-frontend-service:latest
@@ -200,10 +284,30 @@ services:
       - api-gateway
     networks:
       - ecommerce-net
+    cpus: '.2'
+    mem_limit: 200m
+    restart: on-failure:3
 
 networks:
   ecommerce-net:
+    name: ecommerce-net
     driver: bridge
+  product-db:
+    name: product-db
+    driver: bridge
+  order-db:
+    name: order-db
+    driver: bridge
+  user-db:
+    name: user-db
+    driver: bridge
+  payment-db:
+    name: payment-db
+    driver: bridge
+  cart-db:
+    name: cart-db
+    driver: bridge
+
 
 volumes:
   accounts_data:

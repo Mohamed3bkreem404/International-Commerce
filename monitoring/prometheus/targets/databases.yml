@@ -1,0 +1,6 @@
+- targets:
+    - postgres-exporter-accounts:9187
+    - postgres-exporter-orders:9187
+    - postgres-exporter-payment:9187
+    - postgres-exporter-cart:9187
+    - postgres-exporter-product:9187

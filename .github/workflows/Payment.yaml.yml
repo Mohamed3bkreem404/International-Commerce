@@ -2,7 +2,7 @@ name: Deploy payment Service
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
 
 jobs:
   build-and-deploy:
@@ -35,14 +35,14 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-payment-service:latest
         working-directory: Payment Service/Payment-Service
 
-      - name: deploy to k8s via ssh
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            sudo cd /home/ubuntu/International-Commerce
-            git pull origin main
-            sudo kubectl apply -k k8s-v2/ -n ecommerce-v2
-            sudo kubectl rollout restart deployment/payment-deployment -n ecommerce-v2
+#      - name: deploy to k8s via ssh
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ${{ secrets.EC2_USER }}
+#          key: ${{ secrets.EC2_SSH_KEY }}
+#          script: |
+#            sudo cd /home/ubuntu/International-Commerce
+#            git pull origin main
+#            sudo kubectl apply -k k8s-v2/ -n ecommerce-v2
+#            sudo kubectl rollout restart deployment/payment-deployment -n ecommerce-v2
