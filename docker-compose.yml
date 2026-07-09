@@ -107,7 +107,8 @@ services:
     restart: unless-stopped
 
   user-service:
-    image: ineutrono/ecm-user-service
+    #image: ineutrono/ecm-user-service
+    build: ./User Service/User-Service
     container_name: user-service
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://accounts_db:5432/accounts_db
@@ -213,7 +214,7 @@ services:
       start_period: 40s
 
   cart-service:
-    image: ineutrono/ecm-cart-service
+    image: ineutrono/ecm-cart-service:latest
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://cart_db:5432/cart_db
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -242,7 +243,8 @@ services:
       start_period: 40s
 
   api-gateway:
-    image: ineutrono/ecm-api-service
+    #image: ineutrono/ecm-api-service
+    build: ./API Gateway/API-Gateway
     environment:
       - USER_SERVICE_URL=http://user-service:9002
       - PRODUCT_SERVICE_URL=http://product-service:9001
@@ -268,18 +270,13 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
-    cpus: '.1'
     mem_limit: 400m
     restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:9000/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 40s
+
 
   frontend:
-    image: ineutrono/ecm-frontend-service:latest
+    #image: ineutrono/ecm-frontend-service:latest
+    build: ./frontend
     container_name: frontend
     environment:
       - API_PROXY_TARGET=http://api-gateway:9000
@@ -301,11 +298,7 @@ services:
     networks:
       - ecommerce-net
     restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+
 
 networks:
   ecommerce-net:

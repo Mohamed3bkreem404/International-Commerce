@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth
-                            .requestMatchers("/actuator/**").permitAll()
+                            .requestMatchers(HttpMethod.GET , "/actuator/**").permitAll()
                             .requestMatchers(HttpMethod.POST,
                                     "/api/v1/auth/login",
                                     "/api/v1/auth/signUp",
@@ -55,10 +55,6 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-    @Bean
-    public org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/actuator/**");
-    }
 
 
     @Bean

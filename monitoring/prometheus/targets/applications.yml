@@ -1,7 +1,6 @@
 # here i will put all target to scrape from , then in prom file i will use file_sd_configs
 
 - targets:
-    - frontend:3000
     - product-service:9001
     - user-service:9002
     - cart-service:9003

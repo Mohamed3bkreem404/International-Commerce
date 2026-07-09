@@ -1,12 +1,13 @@
 services:
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: Prometheus
     ports:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus/targets:/etc/prometheus/targets
+      - ./prometheus/rules:/etc/prometheus/rules
     networks:
       - monitoring-net
       - ecommerce-net
@@ -23,14 +24,12 @@ services:
     networks:
       - monitoring-net
       - user-db
-    depends_on:
-      accounts_db:
-        condition: service_healthy
+    restart: unless-stopped
 
 
   postgres-exporter-products:
     image: prometheuscommunity/postgres-exporter:latest
-    container_name: postgres-exporter-products
+    container_name: postgres-exporter-product
     environment:
       DATA_SOURCE_NAME: "postgresql://postgres:4015@products_db:5432/products_db?sslmode=disable"
     ports:
@@ -38,10 +37,7 @@ services:
     networks:
       - monitoring-net
       - product-db
-    depends_on:
-      products_db:
-        condition: service_healthy
-
+    restart: unless-stopped
 
   postgres-exporter-orders:
     image: prometheuscommunity/postgres-exporter:latest
@@ -53,10 +49,7 @@ services:
     networks:
       - monitoring-net
       - order-db
-    depends_on:
-      order_db:
-        condition: service_healthy
-
+    restart: unless-stopped
 
   postgres-exporter-cart:
     image: prometheuscommunity/postgres-exporter:latest
@@ -68,9 +61,7 @@ services:
     networks:
       - monitoring-net
       - cart-db
-    depends_on:
-      cart_db:
-        condition: service_healthy
+    restart: unless-stopped
 
 
   postgres-exporter-payment:
@@ -83,11 +74,80 @@ services:
     networks:
       - monitoring-net
       - payment-db
+    restart: unless-stopped
+
+
+
+
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3030:3000"
+    networks:
+      - monitoring-net
     depends_on:
-      payment_db:
-        condition: service_healthy
+      - prometheus
+    restart: unless-stopped
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+
+
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+
+    privileged: true
+
+    restart: unless-stopped
+
+    networks:
+      - monitoring-net
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager-data:/alertmanager
+    env_file:
+      - .env
+    networks:
+      - monitoring-net
+
 
 networks:
   ecommerce-net:
     #same app network
     external: true
+  monitoring-net:
+  product-db:
+    external: true
+  order-db:
+    external: true
+  user-db:
+    external: true
+  payment-db:
+    external: true
+  cart-db:
+    external: true
+
+
+volumes:
+  postgres-data:
+  grafana-data:
+  alertmanager-data:
