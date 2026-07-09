@@ -1,0 +1,63 @@
+groups:
+  - name: application
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 5s
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.job }} is down"
+          description: "{{ $labels.job }} has been unreachable for 1 minute."
+      - alert: HighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total{name!=""}[2m]) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU Usage"
+          description: "{{ $labels.name }} CPU usage is above 80%."
+      - alert: HighMemoryUsage
+        expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""}) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Memory Usage"
+          description: "{{ $labels.name }} memory usage is above 80%."
+      - alert: HighResponseTime
+        expr: (
+          rate(http_server_requests_seconds_sum[2m])
+          /
+          rate(http_server_requests_seconds_count[2m])
+          ) > 1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Response Time"
+          description: "Average response time exceeded 1 second."
+      - alert: HighErrorRate
+        expr: (
+          sum(rate(http_server_requests_seconds_count{status=~"5.."}[2m]))
+          /
+          sum(rate(http_server_requests_seconds_count[2m]))
+          ) * 100 > 5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High Error Rate"
+          description: "5xx errors exceed 5%."
+      - alert: HighJVMHeap
+        expr: (
+          jvm_memory_used_bytes{area="heap"}
+          /
+          jvm_memory_max_bytes{area="heap"}
+          ) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High JVM Heap"
+          description: "Heap usage exceeded 80%."

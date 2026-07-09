@@ -14,7 +14,8 @@ RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-
+#to add health check
+#makes role , group spring to avoid runing as root
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 

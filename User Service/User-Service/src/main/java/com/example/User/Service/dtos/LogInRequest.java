@@ -9,7 +9,7 @@ public record LogInRequest(
         @Size(max = 20, min = 1)
         String username,
 
-        @NotBlank(message = "user name required")
+        @NotBlank(message = "password required")
         @Size(max = 20, min = 1)
         String password
 ) {
