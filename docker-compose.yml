@@ -130,7 +130,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 20s
+      start_period: 40s
 
   product-service:
     image: ineutrono/ecm-product-service
@@ -140,6 +140,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=4015
       - PRODUCT_SERVICE_URL=http://product-service:9001
       - PORT=9001
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     ports:
       - "9001:9001"
     depends_on:
@@ -156,7 +158,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 20s
+      start_period: 40s
 
   order-service:
     image: ineutrono/ecm-order-service
@@ -182,7 +184,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 20s
+      start_period: 40s
 
   payment-service:
     image: ineutrono/ecm-payment-service
@@ -208,7 +210,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 20s
+      start_period: 40s
 
   cart-service:
     image: ineutrono/ecm-cart-service
@@ -218,6 +220,9 @@ services:
       - SPRING_DATASOURCE_PASSWORD=4015
       - PRODUCT_SERVICE_URL=http://product-service:9001
       - PORT=9003
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
     ports:
       - "9003:9003"
     depends_on:
@@ -234,7 +239,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 20s
+      start_period: 40s
 
   api-gateway:
     image: ineutrono/ecm-api-service
@@ -271,7 +276,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 20s
+      start_period: 40s
 
   frontend:
     image: ineutrono/ecm-frontend-service:latest
@@ -287,6 +292,20 @@ services:
     cpus: '.2'
     mem_limit: 200m
     restart: on-failure:3
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - ecommerce-net
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
 networks:
   ecommerce-net:
