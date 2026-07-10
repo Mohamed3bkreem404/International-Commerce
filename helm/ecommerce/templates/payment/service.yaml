@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ecommerce.fullname" .}}-payment-db
+  namespace: {{ .Release.Namespace}}
+spec:
+  selector:
+    {{ include "ecommerce.selectorLabels" . | nindent 4}}
+    app: payment-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{include "ecommerce.fullname"}}-payment-service
+  namespace: {{ .Release.Namespace}}
+
+spec:
+  selector:
+    {{ include "ecommerce.selectorLabels" . | nindent 4}}
+    app: payment
+  ports:
+    - port: 9005
+      targetPort: 9005
+  type: ClusterIP

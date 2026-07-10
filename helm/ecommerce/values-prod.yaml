@@ -1,0 +1,3 @@
+database:
+  CART_SPRING_DATASOURCE_URL: "jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/cart_db"
+  USER_SPRING_DATASOURCE_URL: "jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/accounts_db"
