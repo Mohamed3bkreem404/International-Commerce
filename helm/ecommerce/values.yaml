@@ -1,0 +1,4 @@
+replicaCount: 1
+data:
+  DB_HOST: "international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com"
+  DB_PORT: "5432"

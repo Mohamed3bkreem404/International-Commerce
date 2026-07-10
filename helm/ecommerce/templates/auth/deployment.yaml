@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ecommerce.fullname" . }}user-deployment
+  namespace: ecommerce-v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{ include "ecommerce.selectorLabels" . | nindent 6}}
+      app: user
+  template:
+    metadata:
+      labels:
+        {{ include "ecommerce.selectorLabels" . | nindent 8}}
+        app: user
+    spec:
+      containers:
+        - name: user
+          image: ineutrono/ecm-user-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9002
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce.fullname" . }}-auth-config
+                  key: USER_SPRING_DATASOURCE_URL
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce.fullname" .}}-auth-config
+                  key: USER_PORT
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: ecommerce-secrets
+                  key: DB_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ecommerce-secrets
+                  key: DB_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ecommerce-secrets
+                  key: JWT_SECRET
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          startupProbe:
+            tcpSocket:
+              port: 9002
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            tcpSocket:
+              port: 9002
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 9002
+            initialDelaySeconds: 5
+            periodSeconds: 5
