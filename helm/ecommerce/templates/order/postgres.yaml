@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ecommerce.fullname" . }}-order-db
+  namespace: {{ .Release.Namespace }}
+spec:
+  serviceName: {{ include "ecommerce.fullname" . }}-order-db
+  replicas: 1
+
+  selector:
+    matchLabels:
+      {{- include "ecommerce.selectorLabels" . | nindent 6 }}
+      db: order-db
+
+  template:
+    metadata:
+      labels:
+        {{- include "ecommerce.selectorLabels" . | nindent 8 }}
+        db: order-db
+
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 5432
+
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce.fullname" .}}-order-config
+                  key: ORDER_POSTGRES_DB
+            - name: POSTGRES_USER
+              value: {{ .Values.secrets.dbUsername | quote}}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.secrets.dbPassword | quote}}
+
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+
+      spec:
+        accessModes:
+          - ReadWriteOnce
+
+        resources:
+          requests:
+            storage: 5Gi

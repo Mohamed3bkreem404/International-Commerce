@@ -1,4 +1,12 @@
 replicaCount: 1
 data:
+  #in production
   DB_HOST: "international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com"
-  DB_PORT: "5432"
+  #locally
+
+
+
+secrets:
+  dbUsername: postgres
+  dbPassword: 4015
+  jwtSecret: 32c01665f78c028b589634e3c4ea96a7718356ade9a6ecc34abf0c208adfa0ee

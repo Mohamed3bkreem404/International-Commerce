@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     {{ include "ecommerce.selectorLabels" . | nindent 4}}
-    app: order-db
+    db: order-db
   ports:
     - port: 5432
       targetPort: 5432

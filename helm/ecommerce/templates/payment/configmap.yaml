@@ -6,8 +6,9 @@ metadata:
 
 
 data:
-  PAYMENT_SPRING_DATASOURCE_URL: "jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/payment_db"
-  AYMENT_POSTGRES_DB: "payment_db"
+  #PAYMENT_SPRING_DATASOURCE_URL: "jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/payment_db"
+  PAYMENT_SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ include "ecommerce.fullname" . }}-payment-db:5432/payment_db"
+  PAYMENT_POSTGRES_DB: "payment_db"
   PAYMENT_ORDER_SERVICE_URL: "http://order-service:9004"
   PAYMENT_PORT: "9005"
   API_PAYMENT_SERVICE_URL: "http://payment-service:9005"

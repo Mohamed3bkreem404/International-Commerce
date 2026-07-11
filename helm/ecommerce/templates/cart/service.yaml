@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     {{ include "ecommerce.selectorLabels" . | nindent 4}}
-    app: cart-db
+    db: cart-db
   ports:
     - port: 5432
       targetPort: 5432
@@ -15,8 +15,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cart-service
-  namespace: ecommerce-v2
+  name: {{ include "ecommerce.fullname" . }}-cart-service
+  namespace: {{ .Release.Namespace}}
 
 spec:
   selector:

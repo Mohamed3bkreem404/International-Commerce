@@ -5,5 +5,5 @@ metadata:
   namespace: {{ .Release.Namespace}}
 data:
   FRONTEND_API_PROXY_TARGET: "http://api-gateway:9000"
-  API_ALLOWED_ORIGIN_PATTERNS: {{ .Values.apiGateWay.allowedOrigins | quote }}
+  API_ALLOWED_ORIGIN_PATTERNS: "http://192.168.49.2:30090 , http://international-commerce/ "
 

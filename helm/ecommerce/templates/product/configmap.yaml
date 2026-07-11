@@ -4,7 +4,8 @@ metadata:
   name: {{ include "ecommerce.fullname" . }}-product-config
   namespace: {{ .Release.Namespace}}
 data:
-  PRODUCT_SPRING_DATASOURCE_URL: "jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/products_db"
+  #PRODUCT_SPRING_DATASOURCE_URL: "jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/products_db"
+  PRODUCT_SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ include "ecommerce.fullname" . }}-product-db:5432/product_db"
   PRODUCTS_POSTGRES_DB: "products_db"
   PRODUCT_REDIS_HOST: "redis"
   PRODUCT_REDIS_PORT: "6379"

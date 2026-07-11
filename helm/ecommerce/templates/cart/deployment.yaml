@@ -25,28 +25,19 @@ spec:
             - name: SPRING_DATASOURCE_URL
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "ecommerce.fullname" . }}-cart-config
+                  name: {{ include "ecommerce.fullname" .  }}-cart-config
                   key: CART_SPRING_DATASOURCE_URL
             - name: SPRING_DATASOURCE_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: ecommerce-secrets
-                  key: DB_USER
+              value: {{ .Values.secrets.dbUsername | quote}}
             - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ecommerce-secrets
-                  key: DB_PASSWORD
+              value: {{ .Values.secrets.dbPassword | quote}}
+            - name: JWT_SECRET
+              value: {{ .Values.secrets.jwtSecret | quote}}
             - name: PRODUCT_SERVICE_URL
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "ecommerce.fullname" . }}-cart-config
                   key: CART_PRODUCT_SERVICE_URL
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: ecommerce-secrets
-                  key: JWT_SECRET
             - name: PORT
               valueFrom:
                 configMapKeyRef:
@@ -62,16 +53,16 @@ spec:
           startupProbe:
             tcpSocket:
               port: 9003
-            initialDelaySeconds: 10
+            initialDelaySeconds: 40
             periodSeconds: 5
             failureThreshold: 30
           livenessProbe:
             tcpSocket:
               port: 9003
-            initialDelaySeconds: 30
+            initialDelaySeconds: 40
             periodSeconds: 10
           readinessProbe:
             tcpSocket:
               port: 9003
-            initialDelaySeconds: 5
+            initialDelaySeconds: 40
             periodSeconds: 5

@@ -6,7 +6,10 @@ metadata:
 
 
 data:
-  CART_SPRING_DATASOURCE_URL: "jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/cart_db"
+  #in production
+  #CART_SPRING_DATASOURCE_URL: "jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/cart_db"
+  #in local
+  CART_SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ include "ecommerce.fullname" . }}-cart:5432/cart_db"
   CART_POSTGRES_DB: "cart_db"
   API_CART_SERVICE_URL: "http://cart-service:9003"
   CART_PRODUCT_SERVICE_URL: "http://product-service:9001"

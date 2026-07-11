@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ecommerce.fullname" . }}user-deployment
-  namespace: ecommerce-v2
+  name: {{ include "ecommerce.fullname" . }}-user-deployment
+  namespace: {{ .Release.Namespace}}
 spec:
   replicas: 1
   selector:
@@ -33,20 +33,11 @@ spec:
                   name: {{ include "ecommerce.fullname" .}}-auth-config
                   key: USER_PORT
             - name: SPRING_DATASOURCE_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: ecommerce-secrets
-                  key: DB_USER
+              value: {{ .Values.secrets.dbUsername | quote}}
             - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: ecommerce-secrets
-                  key: DB_PASSWORD
+              value: {{ .Values.secrets.dbPassword | quote}}
             - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: ecommerce-secrets
-                  key: JWT_SECRET
+              value: {{ .Values.secrets.jwtSecret | quote}}
           resources:
             requests:
               cpu: 100m
@@ -57,16 +48,16 @@ spec:
           startupProbe:
             tcpSocket:
               port: 9002
-            initialDelaySeconds: 10
+            initialDelaySeconds: 40
             periodSeconds: 5
             failureThreshold: 30
           livenessProbe:
             tcpSocket:
               port: 9002
-            initialDelaySeconds: 30
+            initialDelaySeconds: 40
             periodSeconds: 10
           readinessProbe:
             tcpSocket:
               port: 9002
-            initialDelaySeconds: 5
+            initialDelaySeconds: 40
             periodSeconds: 5

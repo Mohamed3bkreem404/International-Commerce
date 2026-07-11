@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace}}
 
 data:
-  USER_SPRING_DATASOURCE_URL: "jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/accounts_db"
   ACCOUNTS_POSTGRES_DB: "accounts_db"
   USER_PORT: "9002"
   API_USER_SERVICE_URL: "http://user-service:9002"
+  USER_SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ include "ecommerce.fullname" . }}-accounts-db:5432/accounts_db"
