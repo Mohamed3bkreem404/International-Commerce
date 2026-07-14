@@ -2,7 +2,7 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-ARG API_PROXY_TARGET=http://ecommerce-api-gateway:9000
+ARG API_PROXY_TARGET=http://ecommerce-api-gateway-service:9000
 ENV API_PROXY_TARGET=${API_PROXY_TARGET}
 
 COPY package*.json ./

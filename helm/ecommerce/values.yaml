@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 
 secrets:
@@ -55,6 +55,10 @@ apiGateway:
     port: 9000
 
   nodePort: 30000
+
+  allowedOrigins:
+    - "http://192.168.49.2:30090"
+    - "http://international-commerce.local"
 
 
 
@@ -163,7 +167,7 @@ redis:
 
 frontendConfig:
 
-  apiProxyTarget: "http://api-gateway:9000"
+  apiProxyTarget: "http://{{ include "ecommerce.fullname" . }}-api-gateway-service:9000"
 
   allowedOrigins:
     - "http://192.168.49.2:30090"
