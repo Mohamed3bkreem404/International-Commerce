@@ -3,8 +3,10 @@ kind: StatefulSet
 metadata:
   name: {{ include "ecommerce.fullname" . }}-cart-db
   namespace: {{ .Release.Namespace }}
+
 spec:
   serviceName: {{ include "ecommerce.fullname" . }}-cart-db
+
   replicas: 1
 
   selector:
@@ -21,8 +23,9 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:17
-          imagePullPolicy: IfNotPresent
+
+          image: {{ .Values.database.image }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
 
           ports:
             - containerPort: 5432
@@ -31,12 +34,14 @@ spec:
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "ecommerce.fullname" .}}-cart-config
+                  name: {{ include "ecommerce.fullname" . }}-cart-config
                   key: CART_POSTGRES_DB
+
             - name: POSTGRES_USER
-              value: {{ .Values.secrets.dbUsername | quote}}
+              value: {{ .Values.secrets.dbUsername | quote }}
+
             - name: POSTGRES_PASSWORD
-              value: {{ .Values.secrets.dbPassword | quote}}
+              value: {{ .Values.secrets.dbPassword | quote }}
 
           volumeMounts:
             - name: postgres-data
@@ -52,4 +57,4 @@ spec:
 
         resources:
           requests:
-            storage: 5Gi
+            storage: {{ .Values.database.storage }}

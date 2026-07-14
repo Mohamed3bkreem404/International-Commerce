@@ -1,39 +1,101 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
-  name: {{ include "ecommerce.fullname" .}}-redis-deployment
-  namespace: {{ .Release.Namespace}}
+  name: {{ include "ecommerce.fullname" . }}-redis-deployment
+  namespace: {{ .Release.Namespace }}
+
 spec:
-  replicas: {{ .Values.replicaCount}}
+
+  replicas: {{ .Values.redis.replicaCount }}
+
   selector:
     matchLabels:
-      {{ include "ecommerce.selectorLabels" . | nindent 6}}
+      {{- include "ecommerce.selectorLabels" . | nindent 6 }}
       app: redis
+
+
   template:
+
     metadata:
+
       labels:
-        {{ include "ecommerce.selectorLabels" . | nindent 8}}
+
+        {{- include "ecommerce.selectorLabels" . | nindent 8 }}
+
         app: redis
+
+
     spec:
+
       containers:
+
         - name: redis
-          image: redis:7-alpine
+
+          image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+
           ports:
-            - containerPort: 6379
+
+            - containerPort: {{ .Values.redis.service.port }}
+
+
           resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 250m
-              memory: 256Mi
+
+{{ toYaml .Values.redis.resources | nindent 12 }}
+
+
+
           livenessProbe:
+
             tcpSocket:
-              port: 6379
-            initialDelaySeconds: 10
-            periodSeconds: 10
+
+              port: {{ .Values.redis.service.port }}
+
+            initialDelaySeconds: {{ .Values.redis.probes.liveness.initialDelaySeconds }}
+
+            periodSeconds: {{ .Values.redis.probes.liveness.periodSeconds }}
+
+
+
           readinessProbe:
+
             tcpSocket:
-              port: 6379
-            initialDelaySeconds: 5
-            periodSeconds: 5
+
+              port: {{ .Values.redis.service.port }}
+
+            initialDelaySeconds: {{ .Values.redis.probes.readiness.initialDelaySeconds }}
+
+            periodSeconds: {{ .Values.redis.probes.readiness.periodSeconds }}
+
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+
+  name: {{ include "ecommerce.fullname" . }}-redis
+
+  namespace: {{ .Release.Namespace }}
+
+
+spec:
+
+  selector:
+
+    {{- include "ecommerce.selectorLabels" . | nindent 4 }}
+
+    app: redis
+
+
+  ports:
+
+    - port: {{ .Values.redis.service.port }}
+
+      targetPort: {{ .Values.redis.service.port }}
+
+
+  type: ClusterIP

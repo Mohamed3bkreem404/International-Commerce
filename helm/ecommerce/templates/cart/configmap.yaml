@@ -2,15 +2,15 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "ecommerce.fullname" . }}-cart-config
-  namespace: {{ .Release.Namespace}}
-
+  namespace: {{ .Release.Namespace }}
 
 data:
-  #in production
-  #CART_SPRING_DATASOURCE_URL: "jdbc:postgresql://international-ecommerce-database.c63e8owqifyk.us-east-1.rds.amazonaws.com:5432/cart_db"
-  #in local
-  CART_SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ include "ecommerce.fullname" . }}-cart:5432/cart_db"
+  CART_SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ include "ecommerce.fullname" . }}-cart-db:5432/cart_db"
+
   CART_POSTGRES_DB: "cart_db"
-  API_CART_SERVICE_URL: "http://cart-service:9003"
-  CART_PRODUCT_SERVICE_URL: "http://product-service:9001"
-  CART_PORT: "9003"
+
+  API_CART_SERVICE_URL: "http://{{ include "ecommerce.fullname" . }}-cart-service:{{ .Values.cart.service.port }}"
+
+  CART_PRODUCT_SERVICE_URL: "http://{{ include "ecommerce.fullname" . }}-product-service:{{ .Values.product.service.port }}"
+
+  CART_PORT: {{ .Values.cart.service.port | quote }}

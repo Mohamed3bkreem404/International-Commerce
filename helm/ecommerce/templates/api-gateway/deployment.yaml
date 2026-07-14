@@ -1,77 +1,88 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ecommerce.fullname" . }}api-gateway-deployment
+  name: {{ include "ecommerce.fullname" . }}-api-gateway-deployment
   namespace: {{ .Release.Namespace }}
+
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
+
   selector:
     matchLabels:
       {{- include "ecommerce.selectorLabels" . | nindent 6 }}
       app: api-gateway
+
   template:
     metadata:
       labels:
         {{- include "ecommerce.selectorLabels" . | nindent 8 }}
         app: api-gateway
+
     spec:
       containers:
         - name: api-gateway
-          image: ineutrono/ecm-api-service:latest
-          imagePullPolicy: IfNotPresent
+
+          image: "{{ .Values.apiGateway.image.repository }}:{{ .Values.apiGateway.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
           ports:
-            - containerPort: 9000
+            - containerPort: {{ .Values.apiGateway.service.port }}
+
           env:
             - name: USER_SERVICE_URL
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "ecommerce.fullname" . }}-api-gateway-config
                   key: API_USER_SERVICE_URL
+
             - name: PRODUCT_SERVICE_URL
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "ecommerce.fullname" . }}-api-gateway-config
                   key: API_PRODUCT_SERVICE_URL
+
             - name: CART_SERVICE_URL
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "ecommerce.fullname" . }}-api-gateway-config
                   key: API_CART_SERVICE_URL
+
             - name: ORDER_SERVICE_URL
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "ecommerce.fullname" . }}-api-gateway-config
                   key: API_ORDER_SERVICE_URL
+
             - name: PAYMENT_SERVICE_URL
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "ecommerce.fullname" . }}-api-gateway-config
                   key: API_PAYMENT_SERVICE_URL
+
             - name: ALLOWED_ORIGIN_PATTERNS
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "ecommerce.fullname" . }}-api-gateway-config
                   key: API_ALLOWED_ORIGIN_PATTERNS
+
           resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
+{{ toYaml .Values.resources | nindent 12 }}
+
           startupProbe:
             tcpSocket:
-              port: 9000
-            initialDelaySeconds: 40
-            periodSeconds: 5
-            failureThreshold: 30
+              port: {{ .Values.apiGateway.service.port }}
+            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+
           livenessProbe:
             tcpSocket:
-              port: 9000
-            initialDelaySeconds: 40
-            periodSeconds: 10
+              port: {{ .Values.apiGateway.service.port }}
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+
           readinessProbe:
             tcpSocket:
-              port: 9000
-            initialDelaySeconds: 40
-            periodSeconds: 5
+              port: {{ .Values.apiGateway.service.port }}
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}

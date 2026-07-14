@@ -3,25 +3,33 @@ kind: Service
 metadata:
   name: {{ include "ecommerce.fullname" . }}-cart-db
   namespace: {{ .Release.Namespace }}
+
 spec:
   selector:
-    {{ include "ecommerce.selectorLabels" . | nindent 4}}
+    {{- include "ecommerce.selectorLabels" . | nindent 4 }}
     db: cart-db
+
   ports:
     - port: 5432
       targetPort: 5432
+
+  clusterIP: None
   type: ClusterIP
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "ecommerce.fullname" . }}-cart-service
-  namespace: {{ .Release.Namespace}}
+  namespace: {{ .Release.Namespace }}
 
 spec:
   selector:
+    {{- include "ecommerce.selectorLabels" . | nindent 4 }}
     app: cart
+
   ports:
-    - port: 9003
-      targetPort: 9003
+    - port: {{ .Values.cart.service.port }}
+      targetPort: {{ .Values.cart.service.port }}
+
   type: ClusterIP
