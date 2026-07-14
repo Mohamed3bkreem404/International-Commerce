@@ -31,8 +31,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build \
-          --build-arg API_PROXY_TARGET=http://ecommerce-dev-api-gateway-service:9000 \
+          docker build 
           -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:latest
          
