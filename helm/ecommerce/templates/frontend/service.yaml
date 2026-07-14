@@ -6,7 +6,7 @@ metadata:
 
 spec:
   selector:
-    {{- include "ecommerce.selectorLabels" . | nindent 4 }}
+    {{ include "ecommerce.selectorLabels" . | nindent 4 }}
     app: frontend
 
   ports:
