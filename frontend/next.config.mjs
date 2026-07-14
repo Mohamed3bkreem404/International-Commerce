@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   async rewrites() {
-    const target = process.env.API_PROXY_TARGET || "http://ecommerce-api-gateway:9000";
+    const target = process.env.API_PROXY_TARGET || "http://ecommerce-api-gateway-service:9000";
     return [
       {
         source: "/api/api/:path*",
