@@ -11,4 +11,4 @@ data:
   API_ORDER_SERVICE_URL: "http://{{ include "ecommerce.fullname" . }}-order-service:9004"
   API_PAYMENT_SERVICE_URL: "http://{{ include "ecommerce.fullname" . }}-payment-service:9005"
 
-  API_ALLOWED_ORIGIN_PATTERNS: {{ .Values.apiGateway.allowedOrigins | quote }}
+  API_ALLOWED_ORIGIN_PATTERNS: {{ .Values.apiGateway.API_ALLOWED_ORIGIN_PATTERNS | quote }}

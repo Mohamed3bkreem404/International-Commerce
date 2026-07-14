@@ -56,9 +56,7 @@ apiGateway:
 
   nodePort: 30000
 
-  allowedOrigins:
-    - "http://192.168.49.2:30090"
-    - "http://international-commerce.local"
+  API_ALLOWED_ORIGIN_PATTERNS: "http://192.168.49.2:30090,http://international-commerce.local"
 
 
 
@@ -121,7 +119,7 @@ frontend:
 
   image:
     repository: ineutrono/ecm-frontend-service
-    tag: latest
+    tag: 0.1.0
 
   service:
     port: 3000
@@ -166,8 +164,7 @@ redis:
 
 
 frontendConfig:
-
-  apiProxyTarget: "http://{{ include "ecommerce.fullname" . }}-api-gateway-service:9000"
+  apiProxyTarget: "http://ecommerce-api-gateway-service:9000"
 
   allowedOrigins:
     - "http://192.168.49.2:30090"
