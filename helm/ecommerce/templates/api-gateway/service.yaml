@@ -17,8 +17,6 @@ spec:
   ports:
     - port: {{ .Values.apiGateway.service.port }}
       targetPort: {{ .Values.apiGateway.service.port }}
-      {{- if .Values.apiGateway.service.nodePort }}
-      nodePort:
-      {{ end}}
+      nodePort: {{ .Values.apiGateway.service.nodePort }}
 
   type: NodePort
