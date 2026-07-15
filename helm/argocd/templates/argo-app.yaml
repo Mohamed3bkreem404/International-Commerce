@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ecommerce
-  namespace: argocd
+  name: {{ .Values.application.name}}
+  namespace: {{ .Values.namespace}}
 spec:
-  project: default
+  project: {{ .Values.application.name}}-project
   source:
     repoURL: {{ .Values.source.repoURL}}
     targetRevision: {{ .Values.source.targetRevision}}
@@ -14,5 +14,5 @@ spec:
     namespace: {{.Values.destination.namespace}}
   syncPolicy:
     automated:
-      prune: true
-      selfHeal: true
+      prune: {{ .Values.syncPolicy.prune}}
+      selfHeal: {{ .Values.syncPolicy.selfHeal}}

@@ -1,6 +1,7 @@
 application:
-  name: ecommerce-dev
+  name: ecommerce
 
+namespace: argocd
 project: default
 
 source:
