@@ -124,7 +124,7 @@ frontend:
 
   service:
     port: 3000
-    nodePort: 30090
+    nodePort: 30099
 
 
 
