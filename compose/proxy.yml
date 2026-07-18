@@ -3,9 +3,12 @@ services:
   traefik:
     image: traefik:v3.7
     #opens dashboard with no security (for testing , in production i'will use dashboard + basic auth or Oauth  , provider will be used is docker , log shows info , error
-    command: --api.insecure=true --providers.docker --log.level=INFO -- log.level=ERROR
+    command: --api.insecure=true --providers.docker --log.level=INFO
     ports:
       - "80:80"
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+    networks:
+      - ecommerce-net

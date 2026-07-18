@@ -5,8 +5,8 @@ services:
     container_name: frontend
     environment:
       - API_PROXY_TARGET=http://api-gateway:9000
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     depends_on:
       - api-gateway
     networks:
@@ -14,12 +14,17 @@ services:
     cpus: '.2'
     mem_limit: 200m
     restart: on-failure:3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      - "traefik.http.routers.frontend.priority=1"
 
   redis:
     image: redis:7-alpine
     container_name: redis
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
     networks:
       - ecommerce-net
     restart: unless-stopped
@@ -27,14 +32,13 @@ services:
   user-service:
     image: ineutrono/ecm-user-service
     #build: ../User Service/User-Service
-    container_name: user-service
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://accounts_db:5432/accounts_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=4015
       - PORT=9002
-    ports:
-      - "9002:9002"
+    expose:
+      - "9002"
     depends_on:
       accounts_db:
         condition: service_healthy
@@ -61,8 +65,8 @@ services:
       - PORT=9001
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-    ports:
-      - "9001:9001"
+    expose:
+      - "9001"
     depends_on:
       products_db:
         condition: service_healthy
@@ -87,8 +91,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=4015
       - CART_SERVICE_URL=http://cart-service:9003
       - PORT=9004
-    ports:
-      - "9004:9004"
+    expose:
+      - "9004"
     depends_on:
       order_db:
         condition: service_healthy
@@ -113,8 +117,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=4015
       - ORDER_SERVICE_URL=http://order-service:9004
       - PORT=9005
-    ports:
-      - "9005:9005"
+    expose:
+      - "9005"
     depends_on:
       payment_db:
         condition: service_healthy
@@ -142,8 +146,8 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
 
-    ports:
-      - "9003:9003"
+    expose:
+      - "9003"
     depends_on:
       cart_db:
         condition: service_healthy
@@ -169,8 +173,8 @@ services:
       - CART_SERVICE_URL=http://cart-service:9003
       - ORDER_SERVICE_URL=http://order-service:9004
       - PAYMENT_SERVICE_URL=http://payment-service:9005
-    ports:
-      - "9000:9000"
+    expose:
+      - "9000"
     depends_on:
       user-service:
         condition: service_healthy
@@ -191,3 +195,8 @@ services:
     mem_limit: 400m
     restart: unless-stopped
 
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gateway.rule=PathPrefix(`/api`)"
+      - "traefik.http.services.gateway.loadbalancer.server.port=9000"
+      - "traefik.http.routers.gateway.priority=100"

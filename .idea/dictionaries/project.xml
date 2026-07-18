@@ -4,6 +4,7 @@
       <w>alertmanager</w>
       <w>argocd</w>
       <w>traefik</w>
+      <w>whoami</w>
     </words>
   </dictionary>
 </component>
