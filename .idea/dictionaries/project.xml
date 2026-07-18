@@ -1,7 +1,9 @@
 <component name="ProjectDictionaryState">
   <dictionary name="project">
     <words>
+      <w>alertmanager</w>
       <w>argocd</w>
+      <w>traefik</w>
     </words>
   </dictionary>
 </component>

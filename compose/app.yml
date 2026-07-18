@@ -1,114 +1,32 @@
-
 services:
-  accounts_db:
-    image: postgres:15
-    container_name: accounts_db
+  frontend:
+    #image: ineutrono/ecm-frontend-service:latest
+    build: ../frontend
+    container_name: frontend
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 4015
-      POSTGRES_DB: accounts_db
-    volumes:
-      - accounts_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d accounts_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 5s
+      - API_PROXY_TARGET=http://api-gateway:9000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
     networks:
-      - user-db
-    cpus: '.1'
-    mem_limit: 70m
-    restart: unless-stopped
+      - ecommerce-net
+    cpus: '.2'
+    mem_limit: 200m
+    restart: on-failure:3
 
-
-  products_db:
-    image: postgres:15
-    container_name: products_db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 4015
-      POSTGRES_DB: products_db
-    volumes:
-      - products_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d products_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
     networks:
-      - product-db
-    cpus: '.1'
-    mem_limit: 70m
-    restart: unless-stopped
-
-  order_db:
-    image: postgres:15
-    container_name: order_db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 4015
-      POSTGRES_DB: order_db
-    volumes:
-      - order_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d order_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-    networks:
-      - order-db
-    cpus: '.1'
-    mem_limit: 70m
-    restart: unless-stopped
-
-  cart_db:
-    image: postgres:15
-    container_name: cart_db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 4015
-      POSTGRES_DB: cart_db
-    volumes:
-      - cart_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d cart_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-    networks:
-      - cart-db
-    cpus: '.1'
-    mem_limit: 70m
-    restart: unless-stopped
-
-  payment_db:
-    image: postgres:15
-    container_name: payment_db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 4015
-      POSTGRES_DB: payment_db
-    volumes:
-      - payment_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d payment_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-    networks:
-      - payment-db
-    cpus: '.1'
-    mem_limit: 70m
+      - ecommerce-net
     restart: unless-stopped
 
   user-service:
-    #image: ineutrono/ecm-user-service
-    build: ./User Service/User-Service
+    image: ineutrono/ecm-user-service
+    #build: ../User Service/User-Service
     container_name: user-service
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://accounts_db:5432/accounts_db
@@ -122,7 +40,7 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
-      - user-db
+      - database-net
     cpus: '.5'
     mem_limit: 700m
     restart: on-failure:3
@@ -150,7 +68,7 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
-      - product-db
+      - database-net
     cpus: '.5'
     mem_limit: 700m
     restart: on-failure:3
@@ -176,7 +94,7 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
-      - order-db
+      - database-net
     cpus: '.5'
     mem_limit: 700m
     restart: on-failure:3
@@ -202,7 +120,7 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
-      - payment-db
+      - database-net
     cpus: '.5'
     mem_limit: 700m
     restart: on-failure:3
@@ -231,7 +149,7 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
-      - cart-db
+      - database-net
     cpus: '.5'
     mem_limit: 700m
     restart: on-failure:3
@@ -244,7 +162,7 @@ services:
 
   api-gateway:
     #image: ineutrono/ecm-api-service
-    build: ./API Gateway/API-Gateway
+    build: ../API Gateway/API-Gateway
     environment:
       - USER_SERVICE_URL=http://user-service:9002
       - PRODUCT_SERVICE_URL=http://product-service:9001
@@ -273,57 +191,3 @@ services:
     mem_limit: 400m
     restart: unless-stopped
 
-
-  frontend:
-    #image: ineutrono/ecm-frontend-service:latest
-    build: ./frontend
-    container_name: frontend
-    environment:
-      - API_PROXY_TARGET=http://api-gateway:9000
-    ports:
-      - "3000:3000"
-    depends_on:
-      - api-gateway
-    networks:
-      - ecommerce-net
-    cpus: '.2'
-    mem_limit: 200m
-    restart: on-failure:3
-
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-    networks:
-      - ecommerce-net
-    restart: unless-stopped
-
-
-networks:
-  ecommerce-net:
-    name: ecommerce-net
-    driver: bridge
-  product-db:
-    name: product-db
-    driver: bridge
-  order-db:
-    name: order-db
-    driver: bridge
-  user-db:
-    name: user-db
-    driver: bridge
-  payment-db:
-    name: payment-db
-    driver: bridge
-  cart-db:
-    name: cart-db
-    driver: bridge
-
-
-volumes:
-  accounts_data:
-  products_data:
-  order_data:
-  cart_data:
-  payment_data:

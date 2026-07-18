@@ -23,7 +23,7 @@ services:
       - "9181:9187"
     networks:
       - monitoring-net
-      - user-db
+      - database-net
     restart: unless-stopped
 
 
@@ -36,7 +36,7 @@ services:
       - "9182:9187"
     networks:
       - monitoring-net
-      - product-db
+      - database-net
     restart: unless-stopped
 
   postgres-exporter-orders:
@@ -48,7 +48,7 @@ services:
       - "9183:9187"
     networks:
       - monitoring-net
-      - order-db
+      - database-net
     restart: unless-stopped
 
   postgres-exporter-cart:
@@ -60,7 +60,7 @@ services:
       - "9184:9187"
     networks:
       - monitoring-net
-      - cart-db
+      - database-net
     restart: unless-stopped
 
 
@@ -73,10 +73,8 @@ services:
       - "9185:9187"
     networks:
       - monitoring-net
-      - payment-db
+      - database-net
     restart: unless-stopped
-
-
 
 
 
@@ -101,7 +99,7 @@ services:
     container_name: cadvisor
 
     ports:
-      - "8080:8080"
+      - "8085:8080"
 
     volumes:
       - /:/rootfs:ro
@@ -130,24 +128,24 @@ services:
       - monitoring-net
 
 
-networks:
-  ecommerce-net:
-    #same app network
-    external: true
-  monitoring-net:
-  product-db:
-    external: true
-  order-db:
-    external: true
-  user-db:
-    external: true
-  payment-db:
-    external: true
-  cart-db:
-    external: true
-
-
-volumes:
-  postgres-data:
-  grafana-data:
-  alertmanager-data:
+#networks:
+#  ecommerce-net:
+#    #same app network
+#    external: true
+#  monitoring-net:
+#  product-db:
+#    external: true
+#  order-db:
+#    external: true
+#  user-db:
+#    external: true
+#  payment-db:
+#    external: true
+#  cart-db:
+#    external: true
+#
+#
+#volumes:
+#  postgres-data:
+#  grafana-data:
+#  alertmanager-data:
