@@ -2,7 +2,6 @@ services:
   frontend:
     #image: ineutrono/ecm-frontend-service:latest
     build: ../frontend
-    container_name: frontend
     environment:
       - API_PROXY_TARGET=http://api-gateway:9000
     expose:
@@ -17,6 +16,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      #no need while expose exist but its best practice in production and dont rely on auto detection, or we can use this for multiple labels , or no exposed
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
       - "traefik.http.routers.frontend.priority=1"
 

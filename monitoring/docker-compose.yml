@@ -14,63 +14,13 @@ services:
     restart: unless-stopped
 
 
-  postgres-exporter-accounts:
+  postgres-exporter:
     image: prometheuscommunity/postgres-exporter:latest
-    container_name: postgres-exporter-accounts
+    container_name: postgres-exporter
     environment:
-      DATA_SOURCE_NAME: "postgresql://postgres:4015@accounts_db:5432/accounts_db?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://postgres:4015@postgres:5432/postgres?sslmode=disable"
     ports:
       - "9181:9187"
-    networks:
-      - monitoring-net
-      - database-net
-    restart: unless-stopped
-
-
-  postgres-exporter-products:
-    image: prometheuscommunity/postgres-exporter:latest
-    container_name: postgres-exporter-product
-    environment:
-      DATA_SOURCE_NAME: "postgresql://postgres:4015@products_db:5432/products_db?sslmode=disable"
-    ports:
-      - "9182:9187"
-    networks:
-      - monitoring-net
-      - database-net
-    restart: unless-stopped
-
-  postgres-exporter-orders:
-    image: prometheuscommunity/postgres-exporter:latest
-    container_name: postgres-exporter-orders
-    environment:
-      DATA_SOURCE_NAME: "postgresql://postgres:4015@order_db:5432/order_db?sslmode=disable"
-    ports:
-      - "9183:9187"
-    networks:
-      - monitoring-net
-      - database-net
-    restart: unless-stopped
-
-  postgres-exporter-cart:
-    image: prometheuscommunity/postgres-exporter:latest
-    container_name: postgres-exporter-cart
-    environment:
-      DATA_SOURCE_NAME: "postgresql://postgres:4015@cart_db:5432/cart_db?sslmode=disable"
-    ports:
-      - "9184:9187"
-    networks:
-      - monitoring-net
-      - database-net
-    restart: unless-stopped
-
-
-  postgres-exporter-payment:
-    image: prometheuscommunity/postgres-exporter:latest
-    container_name: postgres-exporter-payment
-    environment:
-      DATA_SOURCE_NAME: "postgresql://postgres:4015@payment_db:5432/payment_db?sslmode=disable"
-    ports:
-      - "9185:9187"
     networks:
       - monitoring-net
       - database-net
@@ -128,6 +78,7 @@ services:
       - monitoring-net
 
 
+
 #networks:
 #  ecommerce-net:
 #    #same app network
@@ -145,7 +96,7 @@ services:
 #    external: true
 #
 #
-#volumes:
-#  postgres-data:
-#  grafana-data:
-#  alertmanager-data:
+volumes:
+  postgres-data:
+  grafana-data:
+  alertmanager-data:
