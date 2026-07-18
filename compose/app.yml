@@ -48,12 +48,12 @@ services:
     cpus: '.5'
     mem_limit: 700m
     restart: on-failure:3
-    healthcheck:
-      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:9002/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 40s
+#    healthcheck:
+#      test: [ "CMD", "wget", "--spider", "-q", "http://127.0.0.1:9002/actuator/health" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 40s
 
   product-service:
     image: ineutrono/ecm-product-service
@@ -176,8 +176,8 @@ services:
     expose:
       - "9000"
     depends_on:
-      user-service:
-        condition: service_healthy
+#      user-service:
+#        condition: service_healthy
 
       product-service:
         condition: service_healthy
