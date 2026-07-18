@@ -1,0 +1,20 @@
+application:
+  name: ecommerce
+
+namespace: argocd
+project: default
+
+source:
+  repoURL: https://github.com/Mohamed3bkreem404/International-Commerce.git
+  targetRevision: develop
+  path: helm/ecommerce
+
+destination:
+  server: https://kubernetes.default.svc
+  namespace: test
+
+syncPolicy:
+  automated: true
+  prune: true
+  selfHeal: true
+  createNamespace: true

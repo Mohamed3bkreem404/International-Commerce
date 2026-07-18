@@ -2,6 +2,10 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+# uncomment this if i will run the project with helm
+#ARG API_PROXY_TARGET=http://ecommerce-api-gateway-service:9000
+
+# currently i use compose so i need compose-apigateway
 ARG API_PROXY_TARGET=http://api-gateway:9000
 ENV API_PROXY_TARGET=${API_PROXY_TARGET}
 

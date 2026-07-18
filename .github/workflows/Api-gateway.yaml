@@ -33,6 +33,9 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:latest
+         
+            
+
         working-directory: API Gateway/API-Gateway
 
 #      - name: Deploy to Kubernetes via SSH

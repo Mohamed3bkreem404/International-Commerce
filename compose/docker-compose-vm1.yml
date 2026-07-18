@@ -1,0 +1,110 @@
+include:
+  - proxy.yml
+
+
+services:
+  frontend:
+    build: ../frontend
+    environment:
+      - API_PROXY_TARGET=http://api-gateway:9000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+    networks:
+      - ecommerce-net
+    cpus: '.2'
+    mem_limit: 200m
+    restart: on-failure:3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`mycommerce.duckdns.org`) && PathPrefix(`/`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      - "traefik.http.routers.frontend.priority=1"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - ecommerce-net
+    restart: unless-stopped
+
+  user-service:
+    image: ineutrono/ecm-user-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://100.93.4.3:5432/accounts_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=4015
+      - PORT=9002
+    ports:
+      - "9002:9002"
+    networks:
+      - ecommerce-net
+    cpus: '.5'
+    mem_limit: 700m
+    restart: on-failure:3
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9002/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  product-service:
+    image: ineutrono/ecm-product-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://100.93.4.3:5432/products_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=4015
+      - PRODUCT_SERVICE_URL=http://product-service:9001
+      - PORT=9001
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - "9001:9001"
+    networks:
+      - ecommerce-net
+    cpus: '.5'
+    mem_limit: 700m
+    restart: on-failure:3
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9001/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  api-gateway:
+    build: ../API Gateway/API-Gateway
+    environment:
+      - USER_SERVICE_URL=http://user-service:9002
+      - PRODUCT_SERVICE_URL=http://product-service:9001
+      - CART_SERVICE_URL=http://100.93.4.3:9003
+      - ORDER_SERVICE_URL=http://100.93.4.3:9004
+      - PAYMENT_SERVICE_URL=http://100.93.4.3:9005
+    ports:
+      - "9000:9000"
+    depends_on:
+      user-service:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
+    networks:
+      - ecommerce-net
+    mem_limit: 400m
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gateway.rule=Host(`mycommerce.duckdns.org`) && PathPrefix(`/api`)"
+      - "traefik.http.services.gateway.loadbalancer.server.port=9000"
+      - "traefik.http.routers.gateway.entrypoints=websecure"
+      - "traefik.http.routers.gateway.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.gateway.priority=100"
+
+networks:
+  ecommerce-net:
+    driver: bridge

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ecommerce.fullname" . }}-cart-config
+  namespace: {{ .Release.Namespace }}
+
+data:
+  CART_SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ include "ecommerce.fullname" . }}-cart-db:5432/cart_db"
+
+  CART_POSTGRES_DB: "cart_db"
+
+  API_CART_SERVICE_URL: "http://{{ include "ecommerce.fullname" . }}-cart-service:{{ .Values.cart.service.port }}"
+
+  CART_PRODUCT_SERVICE_URL: "http://{{ include "ecommerce.fullname" . }}-product-service:{{ .Values.product.service.port }}"
+
+  CART_PORT: {{ .Values.cart.service.port | quote }}

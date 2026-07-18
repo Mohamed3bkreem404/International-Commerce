@@ -1,0 +1,75 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "monitoring.fullname" . }}-alertmanager-config
+  namespace: {{ .Release.Namespace }}
+
+data:
+  alertmanager.yml: |
+    global:
+      smtp_smarthost: ...
+      smtp_from: ...
+
+    route:
+      ...
+
+    receivers:
+      ...
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "monitoring.fullname" . }}-alertmanager
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      {{- include "monitoring.selectorLabels" . | nindent 6 }}
+      app: alertmanager
+
+  template:
+    metadata:
+      labels:
+        {{- include "monitoring.selectorLabels" . | nindent 8 }}
+        app: alertmanager
+
+    spec:
+      containers:
+        - name: alertmanager
+          image: prom/alertmanager:latest
+
+          ports:
+            - containerPort: 9093
+
+          volumeMounts:
+            - name: config
+              mountPath: /etc/alertmanager
+
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "monitoring.fullname" . }}-alertmanager-config
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "monitoring.fullname" .}}-alertmanager
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  selector:
+    {{- include "monitoring.selectorLabels" . | nindent 4 }}
+    app: alertmanager
+
+  ports:
+    - port: 9093
+      targetPort: 9093

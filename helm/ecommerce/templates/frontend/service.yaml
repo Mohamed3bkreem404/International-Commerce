@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ecommerce.fullname" . }}-frontend-service
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  selector:
+    {{ include "ecommerce.selectorLabels" . | nindent 4 }}
+    app: frontend
+
+  ports:
+    - port: {{ .Values.frontend.service.port }}
+      targetPort: {{ .Values.frontend.service.port }}
+      nodePort: {{ .Values.frontend.service.nodePort }}
+
+  type: NodePort

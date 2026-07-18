@@ -1,0 +1,24 @@
+include:
+  - app.yml
+  - databases.yml
+  - proxy.yml
+  - ../monitoring/docker-compose.yml
+
+networks:
+  ecommerce-net:
+    driver: bridge
+
+  database-net:
+    driver: bridge
+
+  monitoring-net:
+    driver: bridge
+
+volumes:
+  accounts_data:
+  products_data:
+  order_data:
+  cart_data:
+  payment_data:
+  grafana-data:
+  alertmanager-data:

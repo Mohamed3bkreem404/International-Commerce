@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ecommerce.fullname" . }}-accounts-db
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  serviceName: {{ include "ecommerce.fullname" . }}-accounts-db
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+      {{- include "ecommerce.selectorLabels" . | nindent 6 }}
+      db: accounts-db
+
+  template:
+    metadata:
+      labels:
+        {{- include "ecommerce.selectorLabels" . | nindent 8 }}
+        db: accounts-db
+
+    spec:
+      containers:
+        - name: postgres
+
+          image: {{ .Values.database.image }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          ports:
+            - containerPort: 5432
+
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce.fullname" . }}-auth-config
+                  key: ACCOUNTS_POSTGRES_DB
+
+            - name: POSTGRES_USER
+              value: {{ .Values.secrets.dbUsername | quote }}
+
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.secrets.dbPassword | quote }}
+
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+
+      spec:
+        accessModes:
+          - ReadWriteOnce
+
+        resources:
+          requests:
+            storage: {{ .Values.database.storage }}

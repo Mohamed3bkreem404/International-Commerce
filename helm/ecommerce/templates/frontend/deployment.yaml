@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ecommerce.fullname" . }}-frontend-deployment
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      {{- include "ecommerce.selectorLabels" . | nindent 6 }}
+      app: frontend
+
+  template:
+    metadata:
+      labels:
+        {{- include "ecommerce.selectorLabels" . | nindent 8 }}
+        app: frontend
+
+    spec:
+      containers:
+        - name: frontend
+
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+
+          ports:
+            - containerPort: {{ .Values.frontend.service.port }}
+
+          env:
+            - name: API_PROXY_TARGET
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce.fullname" . }}-frontend-config
+                  key: FRONTEND_API_PROXY_TARGET
+
+          resources:
+{{ toYaml .Values.resources | nindent 12 }}
+
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.frontend.service.port }}
+            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.frontend.service.port }}
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.frontend.service.port }}
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}

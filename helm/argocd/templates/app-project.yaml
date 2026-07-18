@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ .Values.application.name}}-project
+  namespace: {{ .Values.namespace}}
+spec:
+  description: Simple project for ecommerce app
+
+  sourceRepos:
+    - {{.Values.source.repoURL}}
+  destinations:
+    - namespace: {{ .Values.destination.namespace}}
+      server: {{ .Values.destination.server}}
+      #Here permit charts to create ns
+{{/*  clusterResourceBlacklist:*/}}
+{{/*    - group: ""*/}}
+{{/*      kind: Namespace*/}}
+      #Allowed resources to create
+  namespaceResourceWhitelist:
+    - group: apps
+      kind: Deployment
+
+    - group: apps
+      kind: StatefulSet
+
+    - group: ""
+      kind: Service
+
+    - group: ""
+      kind: ConfigMap
+
+    - group: ""
+      kind: Secret
+
+    - group: ""
+      kind: PersistentVolumeClaim
+
+    - group: networking.k8s.io
+      kind: Ingress
+
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler
+
+    - group: policy
+      kind: PodDisruptionBudget

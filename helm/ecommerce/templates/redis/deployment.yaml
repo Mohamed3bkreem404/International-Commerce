@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ include "ecommerce.fullname" . }}-redis-deployment
+  namespace: {{ .Release.Namespace }}
+
+spec:
+
+  replicas: {{ .Values.redis.replicaCount }}
+
+  selector:
+    matchLabels:
+      {{- include "ecommerce.selectorLabels" . | nindent 6 }}
+      app: redis
+
+
+  template:
+
+    metadata:
+
+      labels:
+
+        {{- include "ecommerce.selectorLabels" . | nindent 8 }}
+
+        app: redis
+
+
+    spec:
+
+      containers:
+
+        - name: redis
+
+          image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+
+          ports:
+
+            - containerPort: {{ .Values.redis.service.port }}
+
+
+          resources:
+
+{{ toYaml .Values.redis.resources | nindent 12 }}
+
+
+
+          livenessProbe:
+
+            tcpSocket:
+
+              port: {{ .Values.redis.service.port }}
+
+            initialDelaySeconds: {{ .Values.redis.probes.liveness.initialDelaySeconds }}
+
+            periodSeconds: {{ .Values.redis.probes.liveness.periodSeconds }}
+
+
+
+          readinessProbe:
+
+            tcpSocket:
+
+              port: {{ .Values.redis.service.port }}
+
+            initialDelaySeconds: {{ .Values.redis.probes.readiness.initialDelaySeconds }}
+
+            periodSeconds: {{ .Values.redis.probes.readiness.periodSeconds }}
+
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+
+  name: {{ include "ecommerce.fullname" . }}-redis
+
+  namespace: {{ .Release.Namespace }}
+
+
+spec:
+
+  selector:
+
+    {{- include "ecommerce.selectorLabels" . | nindent 4 }}
+
+    app: redis
+
+
+  ports:
+
+    - port: {{ .Values.redis.service.port }}
+
+      targetPort: {{ .Values.redis.service.port }}
+
+
+  type: ClusterIP

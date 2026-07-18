@@ -10,3 +10,4 @@
 /httpRequests/
 #k8s secrets
 k8s-v2/secrets.yaml
+helm/ecommerce/values-dev.yaml

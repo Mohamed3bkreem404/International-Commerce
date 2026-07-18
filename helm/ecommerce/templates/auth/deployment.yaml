@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ecommerce.fullname" . }}-user-deployment
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      {{- include "ecommerce.selectorLabels" . | nindent 6 }}
+      app: user
+
+  template:
+    metadata:
+      labels:
+        {{- include "ecommerce.selectorLabels" . | nindent 8 }}
+        app: user
+
+    spec:
+      containers:
+        - name: user
+
+          image: "{{ .Values.user.image.repository }}:{{ .Values.user.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          ports:
+            - containerPort: {{ .Values.user.service.port }}
+
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce.fullname" . }}-auth-config
+                  key: USER_SPRING_DATASOURCE_URL
+
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ecommerce.fullname" . }}-auth-config
+                  key: USER_PORT
+
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.secrets.dbUsername | quote }}
+
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: {{ .Values.secrets.dbPassword | quote }}
+
+            - name: JWT_SECRET
+              value: {{ .Values.secrets.jwtSecret | quote }}
+
+          resources:
+{{ toYaml .Values.resources | nindent 12 }}
+
+          startupProbe:
+            tcpSocket:
+              port: {{ .Values.user.service.port }}
+            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.user.service.port }}
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.user.service.port }}
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
