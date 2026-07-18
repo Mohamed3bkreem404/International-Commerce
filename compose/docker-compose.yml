@@ -15,10 +15,7 @@ networks:
     driver: bridge
 
 volumes:
-  accounts_data:
-  products_data:
-  order_data:
-  cart_data:
+  postgres_data:
   payment_data:
   grafana-data:
   alertmanager-data:

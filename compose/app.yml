@@ -1,7 +1,6 @@
 services:
   frontend:
-    #image: ineutrono/ecm-frontend-service:latest
-    build: ../frontend
+    image: ineutrono/ecm-frontend-service:latest
     environment:
       - API_PROXY_TARGET=http://api-gateway:9000
     expose:
@@ -19,6 +18,8 @@ services:
       #no need while expose exist but its best practice in production and dont rely on auto detection, or we can use this for multiple labels , or no exposed
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
       - "traefik.http.routers.frontend.priority=1"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
 
   redis:
     image: redis:7-alpine
@@ -31,7 +32,6 @@ services:
 
   user-service:
     image: ineutrono/ecm-user-service
-    #build: ../User Service/User-Service
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://accounts_db:5432/accounts_db
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -40,7 +40,7 @@ services:
     expose:
       - "9002"
     depends_on:
-      accounts_db:
+      postgres_data:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -68,7 +68,7 @@ services:
     expose:
       - "9001"
     depends_on:
-      products_db:
+      postgres_data:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -94,7 +94,7 @@ services:
     expose:
       - "9004"
     depends_on:
-      order_db:
+      postgres_data:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -120,7 +120,7 @@ services:
     expose:
       - "9005"
     depends_on:
-      payment_db:
+      postgres_data:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -149,7 +149,7 @@ services:
     expose:
       - "9003"
     depends_on:
-      cart_db:
+      postgres_data:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -200,3 +200,5 @@ services:
       - "traefik.http.routers.gateway.rule=PathPrefix(`/api`)"
       - "traefik.http.services.gateway.loadbalancer.server.port=9000"
       - "traefik.http.routers.gateway.priority=100"
+      - "traefik.http.routers.gateway.entrypoints=websecure"
+      - "traefik.http.routers.gateway.tls.certresolver=letsencrypt"
