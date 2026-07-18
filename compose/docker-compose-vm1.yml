@@ -48,7 +48,7 @@ services:
     mem_limit: 700m
     restart: on-failure:3
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9002/actuator/health"]
+      test: [ "CMD", "wget", "-q", "-O", "-", "http://localhost:9002/actuator/health" ]
       interval: 10s
       timeout: 5s
       retries: 10
