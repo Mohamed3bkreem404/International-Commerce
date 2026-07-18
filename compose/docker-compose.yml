@@ -16,6 +16,5 @@ networks:
 
 volumes:
   postgres_data:
-  payment_data:
   grafana-data:
   alertmanager-data:

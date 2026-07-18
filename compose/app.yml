@@ -40,7 +40,7 @@ services:
     expose:
       - "9002"
     depends_on:
-      postgres_data:
+      postgres:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -68,7 +68,7 @@ services:
     expose:
       - "9001"
     depends_on:
-      postgres_data:
+      postgres:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -94,7 +94,7 @@ services:
     expose:
       - "9004"
     depends_on:
-      postgres_data:
+      postgres:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -120,7 +120,7 @@ services:
     expose:
       - "9005"
     depends_on:
-      postgres_data:
+      postgres:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -149,7 +149,7 @@ services:
     expose:
       - "9003"
     depends_on:
-      postgres_data:
+      postgres:
         condition: service_healthy
     networks:
       - ecommerce-net
