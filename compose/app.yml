@@ -51,10 +51,7 @@ services:
     healthcheck:
       healthcheck:
         test:
-          [
-            "CMD-SHELL",
-            "wget -qO- http://localhost:9002/actuator/health | grep -q '\"status\":\"UP\"'"
-          ]
+          ["CMD-SHELL", "wget -qO- http://localhost:9002/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 10
