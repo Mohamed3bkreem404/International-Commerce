@@ -6,14 +6,16 @@ include:
 
 networks:
   ecommerce-net:
-
     driver: bridge
+    name: ecommerce-net
 
   database-net:
     driver: bridge
+    name: database-net
 
   monitoring-net:
     driver: bridge
+    name: monitoring-net
 
 volumes:
   payment_data:
