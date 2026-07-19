@@ -18,7 +18,7 @@ services:
     restart: on-failure:3
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`mycommerce.duckdns.org`) && PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.rule=Host(`mycommerce.sytes.net`) && PathPrefix(`/`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
       - "traefik.http.routers.frontend.priority=1"
       - "traefik.http.routers.frontend.entrypoints=websecure"
@@ -99,7 +99,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.gateway.rule=Host(`mycommerce.duckdns.org`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.gateway.rule=Host(`mycommerce.sytes.net`) && PathPrefix(`/api`)"
       - "traefik.http.services.gateway.loadbalancer.server.port=9000"
       - "traefik.http.routers.gateway.entrypoints=websecure"
       - "traefik.http.routers.gateway.tls.certresolver=letsencrypt"
