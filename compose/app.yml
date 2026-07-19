@@ -49,7 +49,7 @@ services:
     mem_limit: 700m
     restart: on-failure:3
     healthcheck:
-      test: [ "CMD", "wget", "--spider", "-q", "http://127.0.0.1:9002/actuator/health" ]
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:9002/actuator/health" ]
       interval: 10s
       timeout: 5s
       retries: 10
