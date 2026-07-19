@@ -33,14 +33,14 @@ services:
   user-service:
     image: ineutrono/ecm-user-service
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/accounts_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://accounts_db:5432/accounts_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=4015
       - PORT=9002
     expose:
       - "9002"
     depends_on:
-      postgres:
+      accounts_db:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -48,17 +48,21 @@ services:
     cpus: '.5'
     mem_limit: 700m
     restart: on-failure:3
-#    healthcheck:
-#      test: [ "CMD", "wget", "--spider", "-q", "http://127.0.0.1:9002/actuator/health" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 40s
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://127.0.0.1:9002/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    #two networks on one service make traefik conflics so we need to add these labels
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=ecommerce-net"
 
   product-service:
     image: ineutrono/ecm-product-service
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/products_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://products_db:5432/products_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=4015
       - PRODUCT_SERVICE_URL=http://product-service:9001
@@ -68,7 +72,7 @@ services:
     expose:
       - "9001"
     depends_on:
-      postgres:
+      products_db:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -82,11 +86,15 @@ services:
       timeout: 5s
       retries: 10
       start_period: 40s
+    #two networks on one service make traefik conflics so we need to add these labels
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=ecommerce-net"
 
   order-service:
     image: ineutrono/ecm-order-service
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/order_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://order_db:5432/order_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=4015
       - CART_SERVICE_URL=http://cart-service:9003
@@ -94,7 +102,7 @@ services:
     expose:
       - "9004"
     depends_on:
-      postgres:
+      order_db:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -108,11 +116,15 @@ services:
       timeout: 5s
       retries: 10
       start_period: 40s
+    #two networks on one service make traefik conflics so we need to add these labels
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=ecommerce-net"
 
   payment-service:
     image: ineutrono/ecm-payment-service
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/payment_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://payment_db:5432/payment_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=4015
       - ORDER_SERVICE_URL=http://order-service:9004
@@ -120,7 +132,7 @@ services:
     expose:
       - "9005"
     depends_on:
-      postgres:
+      payment_db:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -134,11 +146,15 @@ services:
       timeout: 5s
       retries: 10
       start_period: 40s
+    #two networks on one service make traefik conflics so we need to add these labels
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=ecommerce-net"
 
   cart-service:
     image: ineutrono/ecm-cart-service:latest
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/cart_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://cart_db:5432/cart_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=4015
       - PRODUCT_SERVICE_URL=http://product-service:9001
@@ -149,7 +165,7 @@ services:
     expose:
       - "9003"
     depends_on:
-      postgres:
+      cart_db:
         condition: service_healthy
     networks:
       - ecommerce-net
@@ -163,10 +179,13 @@ services:
       timeout: 5s
       retries: 10
       start_period: 40s
+    #two networks on one service make traefik conflics so we need to add these labels
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=ecommerce-net"
 
   api-gateway:
-    #image: ineutrono/ecm-api-service
-    build: ../API Gateway/API-Gateway
+    image: ineutrono/ecm-api-service
     environment:
       - USER_SERVICE_URL=http://user-service:9002
       - PRODUCT_SERVICE_URL=http://product-service:9001
@@ -176,8 +195,8 @@ services:
     expose:
       - "9000"
     depends_on:
-#      user-service:
-#        condition: service_healthy
+      user-service:
+        condition: service_healthy
 
       product-service:
         condition: service_healthy

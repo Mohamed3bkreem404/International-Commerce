@@ -1,34 +1,108 @@
 services:
-  postgres:
+  accounts_db:
     image: postgres:15
-    container_name: postgres
-
+    container_name: accounts_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 4015
-      POSTGRES_DB: postgres
-
-    ports:
-      - "5432:5432"
-
+      POSTGRES_DB: accounts_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init:/docker-entrypoint-initdb.d:ro
-
+      - accounts_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d accounts_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    networks:
+      - database-net
+    cpus: '.1'
+    mem_limit: 70m
+    restart: unless-stopped
+
+
+  products_db:
+    image: postgres:15
+    container_name: products_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4015
+      POSTGRES_DB: products_db
+    volumes:
+      - products_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d products_db" ]
       interval: 5s
       timeout: 5s
       retries: 10
       start_period: 10s
-
     networks:
       - database-net
-
-    cpus: '.3'
-    mem_limit: 250m
-
+    cpus: '.1'
+    mem_limit: 70m
     restart: unless-stopped
 
-volumes:
-  postgres_data:
+  order_db:
+    image: postgres:15
+    container_name: order_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4015
+      POSTGRES_DB: order_db
+    volumes:
+      - order_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d order_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - database-net
+    cpus: '.1'
+    mem_limit: 70m
+    restart: unless-stopped
+
+  cart_db:
+    image: postgres:15
+    container_name: cart_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4015
+      POSTGRES_DB: cart_db
+    volumes:
+      - cart_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d cart_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - database-net
+    cpus: '.1'
+    mem_limit: 70m
+    restart: unless-stopped
+
+  payment_db:
+    image: postgres:15
+    container_name: payment_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4015
+      POSTGRES_DB: payment_db
+    volumes:
+      - payment_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d payment_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - database-net
+    cpus: '.1'
+    mem_limit: 70m
+    restart: unless-stopped
+
+

@@ -1,5 +1,0 @@
-CREATE DATABASE accounts_db;
-CREATE DATABASE products_db;
-CREATE DATABASE cart_db;
-CREATE DATABASE order_db;
-CREATE DATABASE payment_db;

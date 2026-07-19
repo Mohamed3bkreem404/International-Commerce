@@ -1,46 +1,46 @@
 # here i will put all target to scrape from , then in prom file i will use file_sd_configs
 # for only one VM
+- targets:
+    - product-service:9001
+    - user-service:9002
+    - cart-service:9003
+    - order-service:9004
+    - payment-service:9005
+
+
+##for two vm
+#
 #- targets:
-#    - product-service:9001
-#    - user-service:9002
-#    - cart-service:9003
-#    - order-service:9004
-#    - payment-service:9005
-
-
-#for two vm
-
-- targets:
-      - 100.65.115.41:9000
-  labels:
-      service: api-gateway
-
-- targets:
-      - 100.65.115.41:9001
-  labels:
-      service: product-service
-
-- targets:
-      - 100.65.115.41:9002
-  labels:
-      service: user-service
-
-- targets:
-      - 100.93.4.3:9003
-  labels:
-      service: cart-service
-
-- targets:
-      - 100.93.4.3:9004
-  labels:
-      service: order-service
-
-- targets:
-      - 100.93.4.3:9005
-  labels:
-      service: payment-service
-
-- targets:
-      - postgres-exporter:9187
-  labels:
-      service: postgres
+#      - 100.65.115.41:9000
+#  labels:
+#      service: api-gateway
+#
+#- targets:
+#      - 100.65.115.41:9001
+#  labels:
+#      service: product-service
+#
+#- targets:
+#      - 100.65.115.41:9002
+#  labels:
+#      service: user-service
+#
+#- targets:
+#      - 100.93.4.3:9003
+#  labels:
+#      service: cart-service
+#
+#- targets:
+#      - 100.93.4.3:9004
+#  labels:
+#      service: order-service
+#
+#- targets:
+#      - 100.93.4.3:9005
+#  labels:
+#      service: payment-service
+#
+#- targets:
+#      - postgres-exporter:9187
+#  labels:
+#      service: postgres

@@ -6,6 +6,7 @@ include:
 
 networks:
   ecommerce-net:
+
     driver: bridge
 
   database-net:
@@ -15,6 +16,10 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
+  payment_data:
+  products_data:
+  order_data:
+  cart_data:
+  accounts_data:
   grafana-data:
   alertmanager-data:

@@ -14,13 +14,62 @@ services:
     restart: unless-stopped
 
 
-  postgres-exporter:
+  postgres-exporter-accounts:
     image: prometheuscommunity/postgres-exporter:latest
-    container_name: postgres-exporter
+    container_name: postgres-exporter-accounts
     environment:
-      DATA_SOURCE_NAME: "postgresql://postgres:4015@postgres:5432/postgres?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://postgres:4015@accounts_db:5432/accounts_db?sslmode=disable"
     ports:
       - "9181:9187"
+    networks:
+      - monitoring-net
+      - database-net
+    restart: unless-stopped
+
+
+  postgres-exporter-products:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter-product
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:4015@products_db:5432/products_db?sslmode=disable"
+    ports:
+      - "9182:9187"
+    networks:
+      - monitoring-net
+      - database-net
+    restart: unless-stopped
+
+  postgres-exporter-orders:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter-orders
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:4015@order_db:5432/order_db?sslmode=disable"
+    ports:
+      - "9183:9187"
+    networks:
+      - monitoring-net
+      - database-net
+    restart: unless-stopped
+
+  postgres-exporter-cart:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter-cart
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:4015@cart_db:5432/cart_db?sslmode=disable"
+    ports:
+      - "9184:9187"
+    networks:
+      - monitoring-net
+      - database-net
+    restart: unless-stopped
+
+  postgres-exporter-payment:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter-payment
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:4015@payment_db:5432/payment_db?sslmode=disable"
+    ports:
+      - "9185:9187"
     networks:
       - monitoring-net
       - database-net
@@ -79,24 +128,5 @@ services:
 
 
 
-#networks:
-#  ecommerce-net:
-#    #same app network
-#    external: true
-#  monitoring-net:
-#  product-db:
-#    external: true
-#  order-db:
-#    external: true
-#  user-db:
-#    external: true
-#  payment-db:
-#    external: true
-#  cart-db:
-#    external: true
-#
-#
-volumes:
-  postgres-data:
-  grafana-data:
-  alertmanager-data:
+
+
