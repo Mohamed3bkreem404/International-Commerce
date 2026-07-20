@@ -18,6 +18,7 @@ services:
       #no need while expose exist but its best practice in production and dont rely on auto detection, or we can use this for multiple labels , or no exposed
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
       - "traefik.http.routers.frontend.priority=1"
+      - "traefik.http.routers.frontend.tls=true"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
 
@@ -220,4 +221,5 @@ services:
       - "traefik.http.services.gateway.loadbalancer.server.port=9000"
       - "traefik.http.routers.gateway.priority=100"
       - "traefik.http.routers.gateway.entrypoints=websecure"
+      - "traefik.http.routers.gateway.tls=true"
       - "traefik.http.routers.gateway.tls.certresolver=letsencrypt"
