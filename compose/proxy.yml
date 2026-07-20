@@ -16,4 +16,5 @@ services:
       - ./acme.json:/etc/traefik/acme.json
 
     networks:
-      - ecommerce-net
+      - frontend-net
+      - backend-net

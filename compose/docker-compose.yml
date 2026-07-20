@@ -5,7 +5,11 @@ include:
   - ../monitoring/docker-compose.yml
 
 networks:
-  ecommerce-net:
+  backend-net:
+    driver: bridge
+    name: backend-net
+
+  frontend-net:
     driver: bridge
     name: ecommerce-net
 

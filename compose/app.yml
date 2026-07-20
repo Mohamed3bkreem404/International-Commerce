@@ -8,7 +8,7 @@ services:
     depends_on:
       - api-gateway
     networks:
-      - ecommerce-net
+      - frontend-net
     cpus: '.2'
     mem_limit: 200m
     restart: on-failure:3
@@ -27,7 +27,7 @@ services:
     expose:
       - "6379"
     networks:
-      - ecommerce-net
+      - backend-net
     restart: unless-stopped
 
   user-service:
@@ -43,7 +43,7 @@ services:
       accounts_db:
         condition: service_healthy
     networks:
-      - ecommerce-net
+      - backend-net
       - database-net
     cpus: '.5'
     mem_limit: 700m
@@ -57,7 +57,7 @@ services:
     #two networks on one service make traefik conflics so we need to add these labels
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=ecommerce-net"
+      - "traefik.docker.network=backend-net"
 
   product-service:
     image: ineutrono/ecm-product-service
@@ -75,7 +75,7 @@ services:
       products_db:
         condition: service_healthy
     networks:
-      - ecommerce-net
+      - backend-net
       - database-net
     cpus: '.5'
     mem_limit: 700m
@@ -89,7 +89,7 @@ services:
     #two networks on one service make traefik conflics so we need to add these labels
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=ecommerce-net"
+      - "traefik.docker.network=backend-net"
 
   order-service:
     image: ineutrono/ecm-order-service
@@ -105,7 +105,7 @@ services:
       order_db:
         condition: service_healthy
     networks:
-      - ecommerce-net
+      - backend-net
       - database-net
     cpus: '.5'
     mem_limit: 700m
@@ -119,7 +119,7 @@ services:
     #two networks on one service make traefik conflics so we need to add these labels
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=ecommerce-net"
+      - "traefik.docker.network=backend-net"
 
   payment-service:
     image: ineutrono/ecm-payment-service
@@ -135,7 +135,7 @@ services:
       payment_db:
         condition: service_healthy
     networks:
-      - ecommerce-net
+      - backend-net
       - database-net
     cpus: '.5'
     mem_limit: 700m
@@ -149,7 +149,7 @@ services:
     #two networks on one service make traefik conflics so we need to add these labels
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=ecommerce-net"
+      - "traefik.docker.network=backend-net"
 
   cart-service:
     image: ineutrono/ecm-cart-service:latest
@@ -168,7 +168,7 @@ services:
       cart_db:
         condition: service_healthy
     networks:
-      - ecommerce-net
+      - backend-net
       - database-net
     cpus: '.5'
     mem_limit: 700m
@@ -182,7 +182,7 @@ services:
     #two networks on one service make traefik conflics so we need to add these labels
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=ecommerce-net"
+      - "traefik.docker.network=backend-net"
 
   api-gateway:
     image: ineutrono/ecm-api-service
@@ -210,7 +210,7 @@ services:
       cart-service:
         condition: service_healthy
     networks:
-      - ecommerce-net
+      - backend-net
     mem_limit: 400m
     restart: unless-stopped
 

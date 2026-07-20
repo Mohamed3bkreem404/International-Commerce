@@ -10,7 +10,7 @@ services:
       - ./prometheus/rules:/etc/prometheus/rules
     networks:
       - monitoring-net
-      - ecommerce-net
+      - backend-net
     restart: unless-stopped
 
 
