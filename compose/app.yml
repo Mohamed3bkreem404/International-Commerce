@@ -59,6 +59,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=backend-net"
+      - "traefik.http.services.user.loadbalancer.server.port=9002"
 
   product-service:
     image: ineutrono/ecm-product-service
