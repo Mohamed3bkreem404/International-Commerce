@@ -5,6 +5,8 @@ api:
   insecure: true
 
 providers:
+  #start , health_status  7s
+  providersThrottleDuration: 8s
   docker:
     watch: true
     #false = only show containers with labels traefik.enable=true , better for security

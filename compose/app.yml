@@ -14,7 +14,7 @@ services:
     restart: on-failure:3
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`) && Host(`mycommerce.sytes.net`)"
       #no need while expose exist but its best practice in production and dont rely on auto detection, or we can use this for multiple labels , or no exposed
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
       - "traefik.http.routers.frontend.priority=1"
@@ -216,7 +216,7 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.gateway.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.gateway.rule=PathPrefix(`/api`) && Host(`mycommerce.sytes.net`)"
       - "traefik.http.services.gateway.loadbalancer.server.port=9000"
       - "traefik.http.routers.gateway.priority=100"
       - "traefik.http.routers.gateway.entrypoints=websecure"

@@ -10,7 +10,8 @@ services:
       - "8080:8080"
       - "443:443"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      #traefik read only from docker sock so he cant modify or delete
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik.yml:/etc/traefik/traefik.yml
       - ./dynamic.yml:/etc/traefik/dynamic.yml
       - ./acme.json:/etc/traefik/acme.json
