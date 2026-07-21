@@ -16,6 +16,19 @@ http:
       compress:
         {}
 
+      #future middlewares
+      auth:
+        basicAuth:
+          users:
+            - "user:hashed password"
+
+      custom-error-pages:
+        errors:
+          status:
+            - "500-599"
+          service: error-pages-service
+          query: "/{status}.html"
+
       frontend-chain:
         chain:
           middlewares:
@@ -28,6 +41,12 @@ http:
             - security-headers
             - api-rate-limit
             - compress
+  services:
+    error-pages-service:
+      loadBalancer:
+        servers:
+          #container name with this port
+          - url: "http://error-pages:80"
 
 
 tls:
