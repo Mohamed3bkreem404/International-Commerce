@@ -2,7 +2,7 @@
 
 api:
   dashboard: true
-  insecure: true
+  insecure: false
 
 providers:
   #start , health_status  7s
