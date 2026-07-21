@@ -4,6 +4,7 @@
       <w>alertmanager</w>
       <w>argocd</w>
       <w>cadvisor</w>
+      <w>contenttypenosniff</w>
       <w>grafana</w>
       <w>letsencrypt</w>
       <w>prometheus</w>

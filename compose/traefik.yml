@@ -39,4 +39,7 @@ certificatesResolvers:
       storage: /etc/traefik/acme.json
       httpChallenge:
         entryPoint: web
+      #if i wanna close port 80 and rely on tls challenge
+      #tlsChallenge:
+      #  {}
 

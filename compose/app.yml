@@ -21,6 +21,9 @@ services:
       - "traefik.http.routers.frontend.tls=true"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.frontend.tls.options=modern@file"
+      - "traefik.http.routers.frontend.middlewares=frontend-chain@file"
+
 
   redis:
     image: redis:7-alpine
@@ -224,3 +227,5 @@ services:
       - "traefik.http.routers.gateway.entrypoints=websecure"
       - "traefik.http.routers.gateway.tls=true"
       - "traefik.http.routers.gateway.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.gateway.tls.options=options@file"
+      - "traefik.http.routers.gateway.middlewares=api-chain@file"

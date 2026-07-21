@@ -1,3 +1,35 @@
+http:
+  middlewares:
+    security-headers:
+      headers:
+        frameDeny: true
+        contentTypeNosniff: true
+        referrerPolicy: strict-origin-when-cross-origin
+        stsSeconds: 31536000
+        stsIncludesSubdomains: true
+
+      api-rate-limit:
+        rateLimit:
+          average: 100
+          burst: 50
+
+      compress:
+        {}
+
+      frontend-chain:
+        chain:
+          middlewares:
+            - security-headers
+            - compression
+
+      api-chain:
+        chain:
+          middlewares:
+            - security-headers
+            - api-rate-limit
+            - compress
+
+
 tls:
   options:
     modern:
