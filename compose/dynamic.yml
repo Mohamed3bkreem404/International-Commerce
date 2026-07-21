@@ -6,7 +6,7 @@ http:
         contentTypeNosniff: true
         referrerPolicy: strict-origin-when-cross-origin
         stsSeconds: 31536000
-        stsIncludesSubdomains: true
+        stsIncludeSubdomains: true
 
     api-rate-limit:
       rateLimit:
@@ -14,7 +14,7 @@ http:
         burst: 50
 
     compress:
-      {}
+      compress: {}
 
 #    #future middlewares
 #    dashboard-auth:
