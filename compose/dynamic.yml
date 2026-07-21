@@ -20,7 +20,8 @@ http:
       dashboard-auth:
         basicAuth:
           users:
-            - "admin:admin"
+            #admin : admin x)
+            - "admin:$2y$05$vqIpyf5X6.8HKE9ohEKw.edvz2YDOhrX0kDwFt1OLheIvY0STvYHi"
 
       custom-error-pages:
         errors:
