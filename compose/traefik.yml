@@ -15,7 +15,26 @@ providers:
     filename: /etc/traefik/dynamic.yml
 
 log:
+  #default is error , debug for more details & troubleshooting
   level: INFO
+
+accessLog:
+  format: json
+  bufferingSize: 100
+  filters:
+    statusCodes:
+      - "400-499"
+      - "500-599"
+    minDuration: "500ms"
+
+  fields:
+    defaultMode: keep
+    headers:
+      defaultMode: drop
+      names:
+        User-Agent: keep
+        Referer: keep
+        Authorization: redact
 
 
 entryPoints:
