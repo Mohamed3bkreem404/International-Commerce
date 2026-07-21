@@ -227,5 +227,5 @@ services:
       - "traefik.http.routers.gateway.entrypoints=websecure"
       - "traefik.http.routers.gateway.tls=true"
       - "traefik.http.routers.gateway.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.gateway.tls.options=options@file"
+      - "traefik.http.routers.gateway.tls.options=modern@file"
       - "traefik.http.routers.gateway.middlewares=api-chain@file"

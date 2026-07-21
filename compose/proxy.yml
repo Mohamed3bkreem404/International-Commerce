@@ -7,6 +7,7 @@ services:
       - --configFile=/etc/traefik/traefik.yml
     ports:
       - "80:80"
+      - "8080:8080"
       - "443:443"
     volumes:
       #traefik read only from docker sock so he cant modify or delete
