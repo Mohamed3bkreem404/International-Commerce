@@ -2,7 +2,7 @@ name: Deploy payment Service
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
 jobs:
   build-and-deploy:
