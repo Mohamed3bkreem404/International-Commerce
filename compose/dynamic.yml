@@ -52,7 +52,7 @@ http:
 
   routers:
     traefik-dashboard:
-      rule: "Host(`traefik.myecommerce.sytes.net`)"
+      rule: "Host(`myecommerce.sytes.net`)"
       entryPoints:
         - websecure
       service: api@internal
