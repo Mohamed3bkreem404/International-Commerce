@@ -8,40 +8,40 @@ http:
         stsSeconds: 31536000
         stsIncludesSubdomains: true
 
-      api-rate-limit:
-        rateLimit:
-          average: 100
-          burst: 50
+    api-rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
 
-      compress:
-        {}
+    compress:
+      {}
 
-      #future middlewares
-      dashboard-auth:
-        basicAuth:
-          users:
-            #admin : admin x)
-            - "admin:$2y$05$vqIpyf5X6.8HKE9ohEKw.edvz2YDOhrX0kDwFt1OLheIvY0STvYHi"
+    #future middlewares
+    dashboard-auth:
+      basicAuth:
+        users:
+          #admin : admin x)
+          - "admin:$2y$05$vqIpyf5X6.8HKE9ohEKw.edvz2YDOhrX0kDwFt1OLheIvY0STvYHi"
 
-      custom-error-pages:
-        errors:
-          status:
-            - "500-599"
-          service: error-pages-service
-          query: "/{status}.html"
+    custom-error-pages:
+      errors:
+        status:
+          - "500-599"
+        service: error-pages-service
+        query: "/{status}.html"
 
-      frontend-chain:
-        chain:
-          middlewares:
-            - security-headers
-            - compression
+    frontend-chain:
+      chain:
+        middlewares:
+          - security-headers
+          - compress
 
-      api-chain:
-        chain:
-          middlewares:
-            - security-headers
-            - api-rate-limit
-            - compress
+    api-chain:
+      chain:
+        middlewares:
+          - security-headers
+          - api-rate-limit
+          - compress
   services:
     error-pages-service:
       loadBalancer:
@@ -52,7 +52,7 @@ http:
 
   routers:
     traefik-dashboard:
-      rule: "Host(`myecommerce.sytes.net`) && ( PathPrefix(`/dashboard) || PathPrefix(`/api`))"
+      rule: "Host(`mycommerce.sytes.net`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))"
       priority: 99
       entryPoints:
         - websecure
