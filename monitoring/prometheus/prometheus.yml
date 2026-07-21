@@ -14,10 +14,11 @@ scrape_configs:
       - files:
           - /etc/prometheus/targets/databases.yml
 
-  - job_name: "cadvisor"
-    static_configs:
-      - targets:
-          - cadvisor:8080
+#  - job_name: "cadvisor"
+#    static_configs:
+#      - targets:
+#          - cadvisor:8080
+
   - job_name: "traefik"
     static_configs:
       - targets:
