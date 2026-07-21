@@ -13,6 +13,7 @@ providers:
     exposedByDefault: true
   file:
     filename: /etc/traefik/dynamic.yml
+    watch: true
 
 log:
   #default is error , debug for more details & troubleshooting
@@ -35,6 +36,14 @@ accessLog:
         User-Agent: keep
         Referer: keep
         Authorization: redact
+
+metrics:
+  prometheus:
+    buckets:
+      - 0.1
+      - 0.3
+      - 1.2
+      - 5.0
 
 
 entryPoints:

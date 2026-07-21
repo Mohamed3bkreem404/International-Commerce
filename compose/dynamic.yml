@@ -17,10 +17,10 @@ http:
         {}
 
       #future middlewares
-      auth:
+      dashboard-auth:
         basicAuth:
           users:
-            - "user:hashed password"
+            - "admin:admin"
 
       custom-error-pages:
         errors:
@@ -47,6 +47,18 @@ http:
         servers:
           #container name with this port
           - url: "http://error-pages:80"
+
+
+  routers:
+    traefik-dashboard:
+      rule: "Host(`traefik.myecommerce.sytes.net`)"
+      entryPoints:
+        - websecure
+      service: api@internal
+      middlewares:
+        - dashboard-auth
+      tls:
+        certResolver: letsencrypt
 
 
 

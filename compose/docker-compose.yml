@@ -11,7 +11,7 @@ networks:
 
   frontend-net:
     driver: bridge
-    name: ecommerce-net
+    name: frontend-net
 
   database-net:
     driver: bridge
