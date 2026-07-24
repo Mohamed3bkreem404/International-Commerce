@@ -1,0 +1,95 @@
+alertmanager:
+  replicaCount: 1
+
+  image:
+    repository: prom/alertmanager
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 9093
+    targetPort: 9093
+
+  config:
+    global:
+      smtpSmarthost: smtp.gmail.com:587
+      smtpFrom: neutmoha@gmail.com
+      smtpAuthUsername: neutmoha@gmail.com
+      smtpAuthPassword: ${SMTP_PASSWORD}
+      smtpRequireTls: true
+
+    route:
+      receiver: email-notifications
+      groupWait: 5s
+      groupInterval: 10s
+      repeatInterval: 1m
+
+    receivers:
+      name: email-notifications
+      emailConfigs:
+        to: neutmoha@gmail.com
+
+grafana:
+  replicaCount: 1
+
+  image:
+    repository: grafana/grafana
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    nodePort: 30300
+
+prometheus:
+  replicaCount: 1
+
+  image:
+    repository: prom/prometheus
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: NodePort
+    port: 9090
+    targetPort: 9090
+    nodePort: 30091
+
+  config:
+    global:
+      scrapeInterval: 15s
+
+    scrapeConfigs:
+      - jobName: cart-service
+        metricsPath: /actuator/prometheus
+        targets:
+          - ecommerce-cart-service.test:9003
+
+      - jobName: order-service
+        metricsPath: /actuator/prometheus
+        targets:
+          - ecommerce-order-service.test:9004
+
+      - jobName: payment-service
+        metricsPath: /actuator/prometheus
+        targets:
+          - ecommerce-payment-service.test:9005
+
+      - jobName: product-service
+        metricsPath: /actuator/prometheus
+        targets:
+          - ecommerce-product-service.test:9001
+
+      - jobName: user-service
+        metricsPath: /actuator/prometheus
+        targets:
+          - ecommerce-user-service.test:9002
+global:
+  smtp_smarthost: {{ .Values.alertmanager.config.global.smtpSmarthost | quote }}
+  smtp_from: {{ .Values.alertmanager.config.global.smtpFrom | quote }}
+  smtp_auth_username: {{ .Values.alertmanager.config.global.smtpAuthUsername | quote }}
+  smtp_auth_password: {{ .Values.alertmanager.config.global.smtpAuthPassword | quote }}
+  smtp_require_tls: {{ .Values.alertmanager.config.global.smtpRequireTls }}

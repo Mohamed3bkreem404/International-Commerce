@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "monitoring.fullname" . }}-prometheus-config
+  namespace: {{ .Release.Namespace }}
+
+data:
+  prometheus.yaml: |
+    global:
+      scrape_interval: {{ .Values.prometheus.config.global.scrapeInterval }}
+
+    scrape_configs:
+{{- range .Values.prometheus.config.scrapeConfigs }}
+      - job_name: {{ .jobName | quote }}
+        metrics_path: {{ .metricsPath | quote }}
+        static_configs:
+          - targets:
+{{- range .targets }}
+              - {{ . | quote }}
+{{- end }}
+{{- end }}

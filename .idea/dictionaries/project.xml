@@ -9,6 +9,7 @@
       <w>grafana</w>
       <w>letsencrypt</w>
       <w>prometheus</w>
+      <w>smarthost</w>
       <w>traefik</w>
       <w>websecure</w>
       <w>whoami</w>

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "monitoring.fullname" . }}-prometheus
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: {{ .Values.prometheus.replicaCount }}
+
+  selector:
+    matchLabels:
+      {{- include "monitoring.selectorLabels" . | nindent 6 }}
+      app: prometheus
+
+  template:
+    metadata:
+      labels:
+        {{- include "monitoring.selectorLabels" . | nindent 8 }}
+        app: prometheus
+
+    spec:
+      containers:
+        - name: prometheus
+          image: "{{ .Values.prometheus.image.repository }}:{{ .Values.prometheus.image.tag }}"
+          imagePullPolicy: {{ .Values.prometheus.image.pullPolicy }}
+
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yaml"
+
+          ports:
+            - containerPort: {{ .Values.prometheus.service.targetPort }}
+
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "monitoring.fullname" . }}-prometheus-config

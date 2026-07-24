@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "monitoring.fullname" . }}-alertmanager
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: {{ .Values.alertmanager.replicaCount }}
+
+  selector:
+    matchLabels:
+      {{- include "monitoring.selectorLabels" . | nindent 6 }}
+      app: alertmanager
+
+  template:
+    metadata:
+      labels:
+        {{- include "monitoring.selectorLabels" . | nindent 8 }}
+        app: alertmanager
+
+    spec:
+      containers:
+        - name: alertmanager
+          image: "{{ .Values.alertmanager.image.repository }}:{{ .Values.alertmanager.image.tag }}"
+          imagePullPolicy: {{ .Values.alertmanager.image.pullPolicy }}
+
+          ports:
+            - containerPort: {{ .Values.alertmanager.service.targetPort }}
+
+          volumeMounts:
+            - name: config
+              mountPath: /etc/alertmanager
+
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "monitoring.fullname" . }}-alertmanager-config
