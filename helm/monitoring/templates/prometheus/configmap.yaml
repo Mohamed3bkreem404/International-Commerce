@@ -5,8 +5,10 @@ metadata:
   namespace: {{ .Release.Namespace }}
 
 data:
+
   prometheus.yaml: |
-    global:
+
+
       scrape_interval: {{ .Values.prometheus.config.global.scrapeInterval }}
 
     scrape_configs:
@@ -19,3 +21,8 @@ data:
               - {{ . | quote }}
 {{- end }}
 {{- end }}
+
+
+
+
+

@@ -88,8 +88,8 @@ prometheus:
         targets:
           - ecommerce-user-service.test:9002
 global:
-  smtp_smarthost: {{ .Values.alertmanager.config.global.smtpSmarthost | quote }}
-  smtp_from: {{ .Values.alertmanager.config.global.smtpFrom | quote }}
-  smtp_auth_username: {{ .Values.alertmanager.config.global.smtpAuthUsername | quote }}
-  smtp_auth_password: {{ .Values.alertmanager.config.global.smtpAuthPassword | quote }}
-  smtp_require_tls: {{ .Values.alertmanager.config.global.smtpRequireTls }}
+  smtpSmarthost: smtp.gmail.com:587
+  smtpFrom: neutmoha@gmail.com
+  smtpAuthUsername: neutmoha@gmail.com
+  smtpAuthPassword: ${SMTP_PASSWORD}
+  smtpRequireTls: true

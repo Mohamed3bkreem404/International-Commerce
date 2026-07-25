@@ -27,3 +27,4 @@ spec:
                 name: {{ include "ecommerce.fullname" . }}-frontend-service
                 port:
                   number: {{ .Values.frontend.service.port }}
+
