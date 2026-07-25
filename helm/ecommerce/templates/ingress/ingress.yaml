@@ -8,6 +8,7 @@ spec:
   ingressClassName: nginx
 
   rules:
+    #DNS
     - host: {{ .Values.ingress.host }}
       http:
         paths:
