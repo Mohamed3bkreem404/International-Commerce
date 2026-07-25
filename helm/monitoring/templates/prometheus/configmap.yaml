@@ -6,9 +6,8 @@ metadata:
 
 data:
 
-  prometheus.yaml: |
-
-
+  prometheus.yml: |
+    global:
       scrape_interval: {{ .Values.prometheus.config.global.scrapeInterval }}
 
     scrape_configs:
@@ -21,6 +20,10 @@ data:
               - {{ . | quote }}
 {{- end }}
 {{- end }}
+
+
+
+
 
 
 

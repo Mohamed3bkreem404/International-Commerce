@@ -26,3 +26,25 @@ spec:
 
           ports:
             - containerPort: {{ .Values.grafana.service.targetPort }}
+          volumeMounts:
+            - name: datasources
+              mountPath: /etc/grafana/provisioning/datasources
+
+            - name: provisioning
+              mountPath: /etc/grafana/provisioning/dashboards
+
+            - name: dashboards
+              mountPath: /var/lib/grafana/dashboards
+
+      volumes:
+        - name: datasources
+          configMap:
+            name: grafana
+
+        - name: provisioning
+          configMap:
+            name: grafana
+
+        - name: dashboards
+          configMap:
+            name: grafana
