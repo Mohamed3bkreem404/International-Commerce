@@ -31,7 +31,10 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:latest .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:$ {{ github.run_number }} .
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway: ${{ github.run_number }} ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:latest
+          
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway: ${{ github.run_number }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:latest
          
             

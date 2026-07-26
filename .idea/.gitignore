@@ -11,3 +11,12 @@
 #k8s secrets
 k8s-v2/secrets.yaml
 helm/ecommerce/values-dev.yaml
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+infra/terraform/aws/
+*.zip
+infra/terraform/aws
