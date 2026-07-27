@@ -1,32 +1,43 @@
-name: Deploy Front
+name: Deploy Frontend
+
 on:
   push:
-    branches: [ "main" ]
+    tags:
+      - "v*"
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
+      - name: Get Image Version
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push Docker image
-        run: |
-          docker build --build-arg API_PROXY_TARGET=http://ecommerce-api-gateway-service:9000 \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-frontend-service:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-frontend-service:latest
+      - name: Build Docker Image
         working-directory: frontend
+        run: |
+          docker build \
+            --build-arg API_PROXY_TARGET=http://ecommerce-api-gateway-service:9000 \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-frontend-service:${{ env.VERSION }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-frontend-service:latest \
+            .
 
-#      - name: Deploy to K8s via SSH
-#        uses: appleboy/ssh-action@master
+      - name: Push Docker Images
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-frontend-service:${{ env.VERSION }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-frontend-service:latest
+
+#      - name: Deploy to Kubernetes via SSH
+#        uses: appleboy/ssh-action@v1.2.0
 #        with:
 #          host: ${{ secrets.EC2_HOST }}
 #          username: ${{ secrets.EC2_USER }}
@@ -34,5 +45,9 @@ jobs:
 #          script: |
 #            cd /home/ubuntu/International-Commerce
 #            git pull origin main
-#            sudo kubectl apply -k k8s-v2/ -n ecommerce-v2
-#            sudo kubectl rollout restart deployment/frontend-deployment -n ecommerce-v2
+#
+#            kubectl set image deployment/frontend-deployment \
+#              frontend=${{ secrets.DOCKERHUB_USERNAME }}/ecm-frontend-service:${{ env.VERSION }} \
+#              -n ecommerce-v2
+#
+#            kubectl rollout status deployment/frontend-deployment -n ecommerce-v2

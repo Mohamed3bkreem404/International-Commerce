@@ -1,5 +1,13 @@
 http:
   middlewares:
+
+    # ip-whitelist:
+    #   ipAllowList:
+    #     sourceRange:
+    #       - ""
+
+
+
     security-headers:
       headers:
         frameDeny: true
@@ -15,6 +23,10 @@ http:
 
     compress:
       compress: {}
+    # ip-whitelist:
+    #   ipAllowList:
+    #     sourceRange:
+    #       - ""
 
 #    #future middlewares
 #    dashboard-auth:
@@ -43,11 +55,37 @@ http:
           - api-rate-limit
           - compress
   services:
+
     error-pages-service:
       loadBalancer:
         servers:
           #container name with this port
           - url: "http://error-pages:80"
+            weight: 2
+            preservePath: true
+        sticky:
+          cookie:
+            name: "error-pages-cookie"
+
+    load-balancer:
+      loadBalancer:
+        servers:
+          - url: "http://backend1:9000"
+            weight: 1
+            preservePath: true
+          - url: "http://backend2:9000"
+            weight: 1
+            preservePath: true
+        strategy: rr
+        healthcheck:
+          path: "/actuator/health"
+          interval: "10s"
+          timeout: "3s"
+        passHostHeader: true
+          
+
+            
+  
 
 #
 #  routers:

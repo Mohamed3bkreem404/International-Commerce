@@ -1,8 +1,9 @@
-name: Deploy api-gateway Service
+name: Deploy API Gateway Service
 
 on:
   push:
-    branches: [ "main" ]
+    tags:
+      - "v*"
 
 jobs:
   build-and-deploy:
@@ -10,45 +11,53 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Get Image Version
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
 
       - name: Build with Maven
-        run: mvn clean package -DskipTests
         working-directory: API Gateway/API-Gateway
+        run: mvn clean package -DskipTests
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:$ {{ github.run_number }} .
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway: ${{ github.run_number }} ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:latest
-          
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway: ${{ github.run_number }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:latest
-         
-            
-
+      - name: Build Docker Image
         working-directory: API Gateway/API-Gateway
+        run: |
+          docker build \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:${{ env.VERSION }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:latest \
+            .
+
+      - name: Push Docker Images
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:${{ env.VERSION }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:latest
 
 #      - name: Deploy to Kubernetes via SSH
-#        uses: appleboy/ssh-action@master
+#        uses: appleboy/ssh-action@v1.2.0
 #        with:
 #          host: ${{ secrets.EC2_HOST }}
 #          username: ${{ secrets.EC2_USER }}
 #          key: ${{ secrets.EC2_SSH_KEY }}
 #          script: |
-#            sudo cd /home/ubuntu/International-Commerce
+#            cd /home/ubuntu/International-Commerce
 #            git pull origin main
-#            sudo kubectl apply -k k8s-v2/ -n ecommerce-v2
-#            sudo kubectl rollout restart deployment/api-gateway-deployment -n ecommerce-v2
+#
+#            kubectl set image deployment/api-gateway-deployment \
+#              api-gateway=${{ secrets.DOCKERHUB_USERNAME }}/ecm-api-gateway:${{ env.VERSION }} \
+#              -n ecommerce-v2
+#
+#            kubectl rollout status deployment/api-gateway-deployment -n ecommerce-v2
