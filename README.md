@@ -2,7 +2,7 @@
 
 <p align="center">
   <img
-    src="./International-Commerce/docs/architecture/ecommerceArch.png"
+    src=".ecommerceArch.png"
     alt="International Commerce Platform Architecture"
     width="100%"
   />
