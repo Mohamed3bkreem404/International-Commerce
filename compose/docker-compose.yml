@@ -1,5 +1,4 @@
 include:
-  - ./backups/docker-compose.yml
   - app.yml
   - databases.yml
   - proxy.yml

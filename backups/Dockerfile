@@ -1,5 +1,4 @@
 FROM postgres:15
-
 RUN apt-get update && \
   apt-get install -y cron && \
   #clean apt cache to reduce image size

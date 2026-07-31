@@ -105,25 +105,32 @@ services:
     mem_limit: 70m
     restart: unless-stopped
 
-postgres-backup:
-  build: ./backup
+  backup:
+    build:
+      context: ../backups
+      dockerfile: Dockerfile
+    container_name: postgres-backup
+    restart: unless-stopped
 
-  container_name: postgres-backup
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4015
 
-  environment:
-    PGPASSWORD: 4015
+    volumes:
+      - ../backups:/backups
 
-  volumes:
-    - postgres_backups:/backups
+    depends_on:
+      accounts_db:
+        condition: service_healthy
+      products_db:
+        condition: service_healthy
+      order_db:
+        condition: service_healthy
+      cart_db:
+        condition: service_healthy
+      payment_db:
+        condition: service_healthy
 
-  depends_on:
-    - accounts_db
-    - products_db
-    - order_db
-    - cart_db
-    - payment_db
 
-  networks:
-    - database-net
-
-  restart: unless-stopped
+    networks:
+      - database-net
