@@ -2,7 +2,7 @@
 
 <p align="center">
   <img
-    src="/home/ineutron/Downloads/E-Commerce Project/ecommerceArch.png"
+    src="ecommerceArch.png"
     alt="International Commerce Platform Architecture"
     width="100%"
   />
