@@ -12,6 +12,7 @@ services:
     cpus: '.2'
     mem_limit: 200m
     restart: on-failure:3
+
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`) && Host(`mycommerce.sytes.net`)"
@@ -189,7 +190,48 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=backend-net"
 
-  api-gateway:
+  api-gateway-1:
+    image: ineutrono/ecm-api-service
+    environment:
+      - USER_SERVICE_URL=http://user-service:9002
+      - PRODUCT_SERVICE_URL=http://product-service:9001
+      - CART_SERVICE_URL=http://cart-service:9003
+      - ORDER_SERVICE_URL=http://order-service:9004
+      - PAYMENT_SERVICE_URL=http://payment-service:9005
+    expose:
+      - "9000"
+    depends_on:
+      user-service:
+        condition: service_healthy
+
+      product-service:
+        condition: service_healthy
+
+      order-service:
+        condition: service_healthy
+
+      payment-service:
+        condition: service_healthy
+
+      cart-service:
+        condition: service_healthy
+    networks:
+      - backend-net
+    mem_limit: 400m
+    restart: unless-stopped
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gateway.rule=PathPrefix(`/api`) && Host(`mycommerce.sytes.net`)"
+      - "traefik.http.services.gateway.loadbalancer.server.port=9000"
+      - "traefik.http.routers.gateway.priority=100"
+      - "traefik.http.routers.gateway.entrypoints=websecure"
+      - "traefik.http.routers.gateway.tls=true"
+      - "traefik.http.routers.gateway.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.gateway.tls.options=modern@file"
+      - "traefik.http.routers.gateway.middlewares=api-chain@file"
+  
+  api-gateway-2:
     image: ineutrono/ecm-api-service
     environment:
       - USER_SERVICE_URL=http://user-service:9002

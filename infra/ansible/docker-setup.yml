@@ -26,11 +26,21 @@
 
   #clone the repository to the root directory
   - name: Clone repository
+    become: false
     ansible.builtin.git:
       repo: https://github.com/Mohamed3bkreem404/International-Commerce.git
       dest: /home/ubuntu/project
       version: main
   #
+
+  - name: give acme permissions to be read and write by traefik
+    ansible.builtin.file:
+      path: /home/ubuntu/project/compose/acme.json
+      owner: root
+      group: root
+      mode: '0600'
+    become: true
+    
   - name: create docker keyring directory
     ansible.builtin.file:
       path: /etc/apt/keyrings

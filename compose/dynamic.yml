@@ -23,10 +23,7 @@ http:
 
     compress:
       compress: {}
-    # ip-whitelist:
-    #   ipAllowList:
-    #     sourceRange:
-    #       - ""
+
 
 #    #future middlewares
 #    dashboard-auth:
@@ -54,8 +51,8 @@ http:
           - security-headers
           - api-rate-limit
           - compress
-  services:
 
+  services:
     error-pages-service:
       loadBalancer:
         servers:
@@ -70,11 +67,9 @@ http:
     load-balancer:
       loadBalancer:
         servers:
-          - url: "http://backend1:9000"
-            weight: 1
+          - url: "http://api-gateway-1:9000"
             preservePath: true
-          - url: "http://backend2:9000"
-            weight: 1
+          - url: "http://api-gateway-2:9000"
             preservePath: true
         strategy: rr
         healthcheck:
