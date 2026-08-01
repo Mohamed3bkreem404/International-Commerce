@@ -3,10 +3,12 @@
   hosts: web
   become: yes
   tasks:
+  #equivalent to sudo apt update
   - name: update apt cache
     ansible.builtin.apt:
       update_cache: yes
 
+  #equivalent to sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
   - name: install required packages
     ansible.builtin.apt:
       name:
@@ -16,6 +18,19 @@
         - software-properties-common
       state: present
 
+  - name: install git
+    ansible.builtin.apt:
+      name: git
+      update_cache: yes
+      state: present
+
+  #clone the repository to the root directory
+  - name: Clone repository
+    ansible.builtin.git:
+      repo: https://github.com/Mohamed3bkreem404/International-Commerce.git
+      dest: /home/ubuntu/project
+      version: main
+  #
   - name: create docker keyring directory
     ansible.builtin.file:
       path: /etc/apt/keyrings
@@ -25,11 +40,12 @@
   - name: download docker gpg key
     ansible.builtin.get_url:
       url: https://download.docker.com/linux/ubuntu/gpg
-      dest: /etc/apt/keyrings/docker.gpg
+      dest: /etc/apt/keyrings/docker.asc
+      mode: '0644'
 
   - name: add docker repository
     ansible.builtin.apt_repository:
-      repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+      repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
       state: present
   
   - name: update apt cache after adding docker repo
@@ -55,5 +71,25 @@
   - name: add user to docker group
     ansible.builtin.user:
       name: ubuntu
-      group: docker
+      groups: docker
       append: true
+
+  - name: Install cloud-guest-utils
+    ansible.builtin.apt:
+      name: cloud-guest-utils
+      state: present
+      update_cache: yes
+
+  - name: Expand root partition
+    ansible.builtin.command:
+      cmd: growpart /dev/nvme0n1 1
+    register: growpart_result
+    changed_when: "'CHANGED' in growpart_result.stdout"
+    failed_when:
+      - growpart_result.rc != 0
+      - "'NOCHANGE' not in growpart_result.stdout"
+
+  - name: Resize ext4 filesystem
+    ansible.builtin.command:
+      cmd: resize2fs /dev/nvme0n1p1
+    when: growpart_result.changed

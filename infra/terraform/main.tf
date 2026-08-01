@@ -88,10 +88,21 @@ resource "aws_security_group" "ecommerce_sg" {
     cidr_blocks = [var.route_table_cidr]
   }
 
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+
+    cidr_blocks = [var.route_table_cidr]
+  }
+
   tags = {
     Name = "ecommerce-sg"
   }
 }
+
+
 
 
 resource "aws_instance" "ecommerce_instance" {
@@ -100,6 +111,11 @@ resource "aws_instance" "ecommerce_instance" {
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.ecommerce_sg.id]
   key_name               = "devops-key"
+
+  root_block_device {
+    volume_size = 30
+    volume_type = "gp3"
+  }
   tags = {
     name = "ecommerce-instance"
   }
