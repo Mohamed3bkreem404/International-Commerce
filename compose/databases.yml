@@ -107,7 +107,7 @@ services:
 
   backup:
     build:
-      context: ../backups
+      context: ./backups
       dockerfile: Dockerfile
     container_name: postgres-backup
     restart: unless-stopped
@@ -117,7 +117,7 @@ services:
       POSTGRES_PASSWORD: 4015
 
     volumes:
-      - ../backups:/backups
+      - ./backups:/backups
 
     depends_on:
       accounts_db:
@@ -135,27 +135,3 @@ services:
     networks:
       - database-net
   
-  postgres-backup:
-    build:
-      context: ./backup
-
-    container_name: postgres-backup
-
-    environment:
-      PGPASSWORD: 4015
-      DATABASES: "accounts_db products_db order_db cart_db payment_db"
-
-    volumes:
-      - postgres_backups:/backups
-
-    depends_on:
-      - accounts_db
-      - products_db
-      - order_db
-      - cart_db
-      - payment_db
-
-    networks:
-      - database-net
-
-    restart: unless-stopped
