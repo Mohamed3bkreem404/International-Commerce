@@ -16,7 +16,7 @@ for DB in $DATABASES
 do
     pg_dump \
         -h "$DB" \
-        -p 5432
+        -p 5432 \
         -U postgres \
         "$DB" \
         | gzip > /backups/"${DATE}"-"${DB}".sql.gz

@@ -1,1 +1,1 @@
-* * * * * /backup.sh 
+* * * * * root /backup.sh >> /var/log/postgres-backup.log 2>&1
