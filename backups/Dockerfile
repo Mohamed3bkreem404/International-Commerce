@@ -8,6 +8,6 @@ COPY backup.sh /backup.sh
 COPY crontab /etc/cron.d/postgres-backup
 
 RUN chmod +x /backup.sh && \
-  chmod 0644 /etc/cron.d/postgres-backup && \
+  chmod 0644 /etc/cron.d/postgres-backup && 
 
-  CMD ["cron", "-f"]
+CMD ["cron", "-f"]
