@@ -134,7 +134,7 @@ services:
 
     networks:
       - database-net
-  services:
+  
   postgres-backup:
     build:
       context: ./backup
