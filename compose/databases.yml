@@ -1,7 +1,6 @@
 services:
   accounts_db:
     image: postgres:15
-    container_name: accounts_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 4015
@@ -23,7 +22,6 @@ services:
 
   products_db:
     image: postgres:15
-    container_name: products_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 4015
@@ -44,7 +42,6 @@ services:
 
   order_db:
     image: postgres:15
-    container_name: order_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 4015
@@ -65,7 +62,6 @@ services:
 
   cart_db:
     image: postgres:15
-    container_name: cart_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 4015
@@ -86,7 +82,6 @@ services:
 
   payment_db:
     image: postgres:15
-    container_name: payment_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 4015
@@ -109,7 +104,6 @@ services:
     build:
       context: ./backups
       dockerfile: Dockerfile
-    container_name: postgres-backup
     restart: unless-stopped
 
     environment:
