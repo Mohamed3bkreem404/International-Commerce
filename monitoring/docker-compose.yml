@@ -88,8 +88,8 @@ services:
     restart: unless-stopped
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
-      - ./monitoring/grafana/provisioning/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning/dashboards:/var/lib/grafana/dashboards
 
 
 
