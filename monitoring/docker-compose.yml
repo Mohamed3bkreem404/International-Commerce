@@ -128,6 +128,8 @@ services:
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     expose:
       - 9100
+    networks:
+      - monitoring-net
 
 
 
