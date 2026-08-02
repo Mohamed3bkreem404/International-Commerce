@@ -9,6 +9,7 @@ scrape_configs:
     file_sd_configs:
       - files:
           - /etc/prometheus/targets/applications.yml
+
   - job_name: "databases"
     file_sd_configs:
       - files:
