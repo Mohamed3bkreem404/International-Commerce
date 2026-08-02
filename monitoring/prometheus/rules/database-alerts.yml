@@ -1,4 +1,4 @@
-roups:
+groups:
   - name: database
     rules:
       - alert: PostgreSQLExporterDown
