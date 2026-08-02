@@ -6,6 +6,7 @@
     - cart-service:9003
     - order-service:9004
     - payment-service:9005
+    -
 
 
 ##for two vm
