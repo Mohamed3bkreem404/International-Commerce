@@ -2,22 +2,22 @@
   "apiVersion": "dashboard.grafana.app/v2",
   "kind": "Dashboard",
   "metadata": {
-    "name": "cadvisor-production",
+    "name": "node-exporter-production",
     "namespace": "default",
-    "uid": "fa5d0a03-f8e3-476e-a186-e9c5c5276bb7"
+    "uid": "ae17b82f-d2a8-454e-9c49-36ef6f852529"
   },
   "spec": {
     "annotations": [],
     "cursorSync": "Crosshair",
-    "description": "Production cAdvisor dashboard for Docker Compose containers. Monitors CPU, memory, networking, filesystem IO, process counts, CPU throttling and OOM events.",
+    "description": "Production Linux host monitoring dashboard using Prometheus Node Exporter. Covers CPU, load, memory, swap, filesystem, disk I/O, network, file descriptors and process health.",
     "editable": true,
     "elements": {
       "panel-1": {
         "kind": "Panel",
         "spec": {
           "id": 1,
-          "title": "Running Containers",
-          "description": "Number of containers currently visible to cAdvisor.",
+          "title": "Host Uptime",
+          "description": "Time since the Linux host booted.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -35,7 +35,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "count(container_last_seen{name=~\"$container\", image!=\"\"})",
+                        "expr": "max(node_time_seconds{instance=~\"$instance\", job=~\"$job\"} - node_boot_time_seconds{instance=~\"$instance\", job=~\"$job\"})",
                         "legendFormat": "__auto",
                         "range": true
                       }
@@ -73,7 +73,7 @@
               },
               "fieldConfig": {
                 "defaults": {
-                  "unit": "short",
+                  "unit": "s",
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -110,7 +110,7 @@
         "spec": {
           "id": 2,
           "title": "CPU Usage",
-          "description": "Total CPU utilization relative to configured CPU quota when limits exist.",
+          "description": "Overall host CPU utilization.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -128,7 +128,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "100 * sum(rate(container_cpu_usage_seconds_total{name=~\"$container\", image!=\"\"}[$__rate_interval])) / clamp_min(sum(container_spec_cpu_quota{name=~\"$container\", image!=\"\"} / container_spec_cpu_period{name=~\"$container\", image!=\"\"}), 1)",
+                        "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{instance=~\"$instance\", job=~\"$job\", mode=\"idle\"}[$__rate_interval])))",
                         "legendFormat": "__auto",
                         "range": true
                       }
@@ -213,7 +213,7 @@
         "spec": {
           "id": 3,
           "title": "Memory Usage",
-          "description": "Container working-set memory utilization relative to configured limits.",
+          "description": "Host memory utilization based on MemAvailable.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -231,7 +231,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "100 * sum(container_memory_working_set_bytes{name=~\"$container\", image!=\"\"}) / clamp_min(sum(container_spec_memory_limit_bytes{name=~\"$container\", image!=\"\"}), 1)",
+                        "expr": "100 * (1 - (node_memory_MemAvailable_bytes{instance=~\"$instance\", job=~\"$job\"} / node_memory_MemTotal_bytes{instance=~\"$instance\", job=~\"$job\"}))",
                         "legendFormat": "__auto",
                         "range": true
                       }
@@ -315,8 +315,8 @@
         "kind": "Panel",
         "spec": {
           "id": 4,
-          "title": "Memory Working Set",
-          "description": "Current working-set memory across selected containers.",
+          "title": "Root Filesystem Usage",
+          "description": "Root filesystem utilization.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -334,7 +334,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum(container_memory_working_set_bytes{name=~\"$container\", image!=\"\"})",
+                        "expr": "100 * (1 - (node_filesystem_avail_bytes{instance=~\"$instance\", job=~\"$job\", mountpoint=\"/\", fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{instance=~\"$instance\", job=~\"$job\", mountpoint=\"/\", fstype!~\"tmpfs|overlay\"}))",
                         "legendFormat": "__auto",
                         "range": true
                       }
@@ -350,15 +350,21 @@
           },
           "vizConfig": {
             "kind": "VizConfig",
-            "group": "stat",
+            "group": "gauge",
             "version": "13.1.0",
             "spec": {
               "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "horizontal",
-                "percentChangeColorMode": "standard",
+                "barShape": "flat",
+                "barWidthFactor": 0.55,
+                "effects": {
+                  "barGlow": false,
+                  "centerGlow": false,
+                  "gradient": true
+                },
+                "endpointMarker": "point",
+                "minVizHeight": 75,
+                "minVizWidth": 75,
+                "orientation": "auto",
                 "reduceOptions": {
                   "calcs": [
                     "lastNotNull"
@@ -366,36 +372,41 @@
                   "fields": "",
                   "values": false
                 },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
+                "segmentCount": 8,
+                "segmentSpacing": 0.2,
+                "shape": "gauge",
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true,
+                "sizing": "auto",
+                "sparkline": true,
+                "textMode": "auto"
               },
               "fieldConfig": {
                 "defaults": {
-                  "unit": "bytes",
+                  "unit": "percent",
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
                       {
                         "value": 0,
                         "color": "green"
+                      },
+                      {
+                        "value": 75,
+                        "color": "yellow"
+                      },
+                      {
+                        "value": 90,
+                        "color": "red"
                       }
                     ]
                   },
                   "color": {
                     "mode": "thresholds"
                   },
-                  "mappings": [
-                    {
-                      "type": "special",
-                      "options": {
-                        "match": "null",
-                        "result": {
-                          "text": "N/A"
-                        }
-                      }
-                    }
-                  ]
+                  "min": 0,
+                  "max": 100,
+                  "decimals": 1
                 },
                 "overrides": []
               }
@@ -407,8 +418,8 @@
         "kind": "Panel",
         "spec": {
           "id": 5,
-          "title": "Network RX",
-          "description": "Incoming container network throughput.",
+          "title": "Load Average 1m",
+          "description": "1-minute host load average.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -426,7 +437,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum(rate(container_network_receive_bytes_total{name=~\"$container\"}[$__rate_interval]))",
+                        "expr": "max(node_load1{instance=~\"$instance\", job=~\"$job\"})",
                         "legendFormat": "__auto",
                         "range": true
                       }
@@ -464,13 +475,21 @@
               },
               "fieldConfig": {
                 "defaults": {
-                  "unit": "Bps",
+                  "unit": "short",
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
                       {
                         "value": 0,
                         "color": "green"
+                      },
+                      {
+                        "value": 2,
+                        "color": "yellow"
+                      },
+                      {
+                        "value": 4,
+                        "color": "red"
                       }
                     ]
                   },
@@ -488,7 +507,7 @@
                       }
                     }
                   ],
-                  "decimals": 1
+                  "decimals": 2
                 },
                 "overrides": []
               }
@@ -500,8 +519,8 @@
         "kind": "Panel",
         "spec": {
           "id": 6,
-          "title": "Network TX",
-          "description": "Outgoing container network throughput.",
+          "title": "CPU Cores",
+          "description": "Detected CPU cores.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -519,7 +538,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum(rate(container_network_transmit_bytes_total{name=~\"$container\"}[$__rate_interval]))",
+                        "expr": "sum(count without (cpu,mode) (node_cpu_seconds_total{instance=~\"$instance\", job=~\"$job\", mode=\"idle\"}))",
                         "legendFormat": "__auto",
                         "range": true
                       }
@@ -557,7 +576,7 @@
               },
               "fieldConfig": {
                 "defaults": {
-                  "unit": "Bps",
+                  "unit": "short",
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -581,7 +600,7 @@
                       }
                     }
                   ],
-                  "decimals": 1
+                  "decimals": 0
                 },
                 "overrides": []
               }
@@ -593,8 +612,8 @@
         "kind": "Panel",
         "spec": {
           "id": 7,
-          "title": "CPU by Container",
-          "description": "CPU consumption grouped by container.",
+          "title": "CPU Usage by Mode",
+          "description": "CPU utilization grouped by mode.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -612,8 +631,8 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "100 * sum by (name) (rate(container_cpu_usage_seconds_total{name=~\"$container\", image!=\"\"}[$__rate_interval]))",
-                        "legendFormat": "{{name}}",
+                        "expr": "100 * avg by (mode) (rate(node_cpu_seconds_total{instance=~\"$instance\", job=~\"$job\", mode!=\"idle\"}[$__rate_interval]))",
+                        "legendFormat": "{{mode}}",
                         "range": true
                       }
                     },
@@ -722,8 +741,8 @@
         "kind": "Panel",
         "spec": {
           "id": 8,
-          "title": "Memory Working Set by Container",
-          "description": "Working-set memory grouped by container.",
+          "title": "Load Average",
+          "description": "Linux load average over 1, 5 and 15 minutes.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -741,12 +760,54 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum by (name) (container_memory_working_set_bytes{name=~\"$container\", image!=\"\"})",
-                        "legendFormat": "{{name}}",
+                        "expr": "max(node_load1{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "1m",
                         "range": true
                       }
                     },
                     "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "max(node_load5{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "5m",
+                        "range": true
+                      }
+                    },
+                    "refId": "B",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "max(node_load15{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "15m",
+                        "range": true
+                      }
+                    },
+                    "refId": "C",
                     "hidden": false
                   }
                 }
@@ -784,7 +845,7 @@
               },
               "fieldConfig": {
                 "defaults": {
-                  "unit": "bytes",
+                  "unit": "short",
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -830,7 +891,8 @@
                     "thresholdsStyle": {
                       "mode": "off"
                     }
-                  }
+                  },
+                  "decimals": 2
                 },
                 "overrides": []
               }
@@ -842,8 +904,8 @@
         "kind": "Panel",
         "spec": {
           "id": 9,
-          "title": "Memory Usage vs Limit",
-          "description": "Container memory consumption compared with configured memory limits.",
+          "title": "Memory Breakdown",
+          "description": "Host memory composition.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -861,8 +923,8 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum by (name) (container_memory_working_set_bytes{name=~\"$container\", image!=\"\"})",
-                        "legendFormat": "{{name}} used",
+                        "expr": "sum(node_memory_MemTotal_bytes{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "total",
                         "range": true
                       }
                     },
@@ -882,12 +944,54 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum by (name) (container_spec_memory_limit_bytes{name=~\"$container\", image!=\"\"})",
-                        "legendFormat": "{{name}} limit",
+                        "expr": "sum(node_memory_MemAvailable_bytes{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "available",
                         "range": true
                       }
                     },
                     "refId": "B",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(node_memory_Cached_bytes{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "cached",
+                        "range": true
+                      }
+                    },
+                    "refId": "C",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(node_memory_Buffers_bytes{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "buffers",
+                        "range": true
+                      }
+                    },
+                    "refId": "D",
                     "hidden": false
                   }
                 }
@@ -983,8 +1087,8 @@
         "kind": "Panel",
         "spec": {
           "id": 10,
-          "title": "Network Throughput by Container",
-          "description": "Network receive/transmit throughput grouped by container.",
+          "title": "Swap Usage",
+          "description": "Swap usage. Sustained swap growth may indicate memory pressure.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -1002,8 +1106,8 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum by (name) (rate(container_network_receive_bytes_total{name=~\"$container\"}[$__rate_interval]))",
-                        "legendFormat": "{{name}} RX",
+                        "expr": "sum(node_memory_SwapTotal_bytes{instance=~\"$instance\", job=~\"$job\"} - node_memory_SwapFree_bytes{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "used",
                         "range": true
                       }
                     },
@@ -1023,132 +1127,12 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum by (name) (rate(container_network_transmit_bytes_total{name=~\"$container\"}[$__rate_interval]))",
-                        "legendFormat": "{{name}} TX",
+                        "expr": "sum(node_memory_SwapTotal_bytes{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "total",
                         "range": true
                       }
                     },
                     "refId": "B",
-                    "hidden": false
-                  }
-                }
-              ],
-              "transformations": [],
-              "queryOptions": {}
-            }
-          },
-          "vizConfig": {
-            "kind": "VizConfig",
-            "group": "timeseries",
-            "version": "13.1.0",
-            "spec": {
-              "options": {
-                "annotations": {
-                  "clustering": -1,
-                  "multiLane": false
-                },
-                "legend": {
-                  "calcs": [
-                    "lastNotNull",
-                    "max"
-                  ],
-                  "displayMode": "list",
-                  "enableFacetedFilter": false,
-                  "overflow": "ellipsis",
-                  "placement": "bottom",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "hideZeros": false,
-                  "mode": "multi",
-                  "sort": "desc"
-                }
-              },
-              "fieldConfig": {
-                "defaults": {
-                  "unit": "Bps",
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "value": 0,
-                        "color": "green"
-                      }
-                    ]
-                  },
-                  "color": {
-                    "mode": "palette-classic"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 14,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "insertNulls": false,
-                    "lineInterpolation": "smooth",
-                    "lineWidth": 2,
-                    "pointSize": 4,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "showPoints": "never",
-                    "showValues": false,
-                    "spanNulls": true,
-                    "stacking": {
-                      "group": "A",
-                      "mode": "none"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  }
-                },
-                "overrides": []
-              }
-            }
-          }
-        }
-      },
-      "panel-11": {
-        "kind": "Panel",
-        "spec": {
-          "id": 11,
-          "title": "Filesystem Usage",
-          "description": "Container filesystem usage.",
-          "links": [],
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "prometheus",
-                      "version": "v0",
-                      "datasource": {
-                        "name": "fftywdgwmoq2od"
-                      },
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sum by (name) (container_fs_usage_bytes{name=~\"$container\", image!=\"\"})",
-                        "legendFormat": "{{name}}",
-                        "range": true
-                      }
-                    },
-                    "refId": "A",
                     "hidden": false
                   }
                 }
@@ -1240,12 +1224,12 @@
           }
         }
       },
-      "panel-12": {
+      "panel-11": {
         "kind": "Panel",
         "spec": {
-          "id": 12,
-          "title": "Filesystem Read / Write",
-          "description": "Container block read/write throughput.",
+          "id": 11,
+          "title": "Filesystem Usage by Mount",
+          "description": "Filesystem utilization by mount point.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -1263,8 +1247,137 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum by (name) (rate(container_fs_reads_bytes_total{name=~\"$container\", image!=\"\"}[$__rate_interval]))",
-                        "legendFormat": "{{name}} read",
+                        "expr": "100 * (1 - (node_filesystem_avail_bytes{instance=~\"$instance\", job=~\"$job\", fstype!~\"tmpfs|overlay|squashfs\"} / node_filesystem_size_bytes{instance=~\"$instance\", job=~\"$job\", fstype!~\"tmpfs|overlay|squashfs\"}))",
+                        "legendFormat": "{{mountpoint}}",
+                        "range": true
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.1.0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "lastNotNull",
+                    "max"
+                  ],
+                  "displayMode": "list",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "percent",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 75,
+                        "color": "yellow"
+                      },
+                      {
+                        "value": 90,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 14,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "smooth",
+                    "lineWidth": 2,
+                    "pointSize": 4,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "decimals": 1
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-12": {
+        "kind": "Panel",
+        "spec": {
+          "id": 12,
+          "title": "Disk Read / Write Throughput",
+          "description": "Disk I/O throughput by device.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum by (device) (rate(node_disk_read_bytes_total{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval]))",
+                        "legendFormat": "{{device}} read",
                         "range": true
                       }
                     },
@@ -1284,8 +1397,8 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum by (name) (rate(container_fs_writes_bytes_total{name=~\"$container\", image!=\"\"}[$__rate_interval]))",
-                        "legendFormat": "{{name}} write",
+                        "expr": "sum by (device) (rate(node_disk_written_bytes_total{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval]))",
+                        "legendFormat": "{{device}} write",
                         "range": true
                       }
                     },
@@ -1385,8 +1498,8 @@
         "kind": "Panel",
         "spec": {
           "id": 13,
-          "title": "Container Processes",
-          "description": "Running process count per container.",
+          "title": "Disk IOPS",
+          "description": "Disk operations per second by device.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -1404,12 +1517,33 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum by (name) (container_processes{name=~\"$container\", image!=\"\"})",
-                        "legendFormat": "{{name}}",
+                        "expr": "sum by (device) (rate(node_disk_reads_completed_total{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval]))",
+                        "legendFormat": "{{device}} reads/s",
                         "range": true
                       }
                     },
                     "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum by (device) (rate(node_disk_writes_completed_total{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval]))",
+                        "legendFormat": "{{device}} writes/s",
+                        "range": true
+                      }
+                    },
+                    "refId": "B",
                     "hidden": false
                   }
                 }
@@ -1447,7 +1581,7 @@
               },
               "fieldConfig": {
                 "defaults": {
-                  "unit": "short",
+                  "unit": "ops",
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -1494,7 +1628,7 @@
                       "mode": "off"
                     }
                   },
-                  "decimals": 0
+                  "decimals": 2
                 },
                 "overrides": []
               }
@@ -1506,8 +1640,8 @@
         "kind": "Panel",
         "spec": {
           "id": 14,
-          "title": "CPU Throttling",
-          "description": "Percentage of CPU scheduling periods that were throttled.",
+          "title": "Network Throughput",
+          "description": "Host network receive/transmit throughput.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -1525,12 +1659,33 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "100 * sum by (name) (rate(container_cpu_cfs_throttled_periods_total{name=~\"$container\", image!=\"\"}[$__rate_interval])) / clamp_min(sum by (name) (rate(container_cpu_cfs_periods_total{name=~\"$container\", image!=\"\"}[$__rate_interval])), 0.000001)",
-                        "legendFormat": "{{name}}",
+                        "expr": "sum by (device) (rate(node_network_receive_bytes_total{instance=~\"$instance\", job=~\"$job\", device!~\"lo|veth.*|docker.*|br-.*\"}[$__rate_interval]))",
+                        "legendFormat": "{{device}} RX",
                         "range": true
                       }
                     },
                     "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum by (device) (rate(node_network_transmit_bytes_total{instance=~\"$instance\", job=~\"$job\", device!~\"lo|veth.*|docker.*|br-.*\"}[$__rate_interval]))",
+                        "legendFormat": "{{device}} TX",
+                        "range": true
+                      }
+                    },
+                    "refId": "B",
                     "hidden": false
                   }
                 }
@@ -1568,7 +1723,190 @@
               },
               "fieldConfig": {
                 "defaults": {
-                  "unit": "percent",
+                  "unit": "Bps",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 14,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "smooth",
+                    "lineWidth": 2,
+                    "pointSize": 4,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-15": {
+        "kind": "Panel",
+        "spec": {
+          "id": 15,
+          "title": "Network Errors & Drops",
+          "description": "Network errors and dropped packets.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum by (device) (rate(node_network_receive_errs_total{instance=~\"$instance\", job=~\"$job\", device!=\"lo\"}[$__rate_interval]))",
+                        "legendFormat": "{{device}} RX errors",
+                        "range": true
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum by (device) (rate(node_network_transmit_errs_total{instance=~\"$instance\", job=~\"$job\", device!=\"lo\"}[$__rate_interval]))",
+                        "legendFormat": "{{device}} TX errors",
+                        "range": true
+                      }
+                    },
+                    "refId": "B",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum by (device) (rate(node_network_receive_drop_total{instance=~\"$instance\", job=~\"$job\", device!=\"lo\"}[$__rate_interval]))",
+                        "legendFormat": "{{device}} RX drops",
+                        "range": true
+                      }
+                    },
+                    "refId": "C",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum by (device) (rate(node_network_transmit_drop_total{instance=~\"$instance\", job=~\"$job\", device!=\"lo\"}[$__rate_interval]))",
+                        "legendFormat": "{{device}} TX drops",
+                        "range": true
+                      }
+                    },
+                    "refId": "D",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.1.0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "lastNotNull",
+                    "max"
+                  ],
+                  "displayMode": "list",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "ops",
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -1577,11 +1915,11 @@
                         "color": "green"
                       },
                       {
-                        "value": 10,
+                        "value": 1,
                         "color": "yellow"
                       },
                       {
-                        "value": 25,
+                        "value": 10,
                         "color": "red"
                       }
                     ]
@@ -1623,7 +1961,7 @@
                       "mode": "off"
                     }
                   },
-                  "decimals": 1
+                  "decimals": 2
                 },
                 "overrides": []
               }
@@ -1631,12 +1969,12 @@
           }
         }
       },
-      "panel-15": {
+      "panel-16": {
         "kind": "Panel",
         "spec": {
-          "id": 15,
-          "title": "OOM Events",
-          "description": "Out-of-memory events during the last 5 minutes.",
+          "id": 16,
+          "title": "File Descriptors",
+          "description": "Allocated versus maximum file descriptors.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -1654,12 +1992,33 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum by (name) (increase(container_oom_events_total{name=~\"$container\"}[5m]))",
-                        "legendFormat": "{{name}}",
+                        "expr": "sum(node_filefd_allocated{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "allocated",
                         "range": true
                       }
                     },
                     "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(node_filefd_maximum{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "maximum",
+                        "range": true
+                      }
+                    },
+                    "refId": "B",
                     "hidden": false
                   }
                 }
@@ -1704,10 +2063,147 @@
                       {
                         "value": 0,
                         "color": "green"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 14,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "smooth",
+                    "lineWidth": 2,
+                    "pointSize": 4,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-17": {
+        "kind": "Panel",
+        "spec": {
+          "id": 17,
+          "title": "Processes",
+          "description": "Running and blocked processes.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
                       },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(node_procs_running{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "running",
+                        "range": true
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(node_procs_blocked{instance=~\"$instance\", job=~\"$job\"})",
+                        "legendFormat": "blocked",
+                        "range": true
+                      }
+                    },
+                    "refId": "B",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.1.0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "lastNotNull",
+                    "max"
+                  ],
+                  "displayMode": "list",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "short",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
                       {
-                        "value": 1,
-                        "color": "red"
+                        "value": 0,
+                        "color": "green"
                       }
                     ]
                   },
@@ -1749,6 +2245,127 @@
                     }
                   },
                   "decimals": 0
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-18": {
+        "kind": "Panel",
+        "spec": {
+          "id": 18,
+          "title": "Context Switches",
+          "description": "Kernel context switches per second.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "prometheus",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "fftywdgwmoq2od"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(rate(node_context_switches_total{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval]))",
+                        "legendFormat": "context switches/sec",
+                        "range": true
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "13.1.0",
+            "spec": {
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "lastNotNull",
+                    "max"
+                  ],
+                  "displayMode": "list",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "ops",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 14,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "smooth",
+                    "lineWidth": 2,
+                    "pointSize": 4,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "decimals": 2
                 },
                 "overrides": []
               }
@@ -1764,7 +2381,7 @@
           {
             "kind": "RowsLayoutRow",
             "spec": {
-              "title": "Container Overview",
+              "title": "Host Overview",
               "collapse": false,
               "layout": {
                 "kind": "GridLayout",
@@ -1856,7 +2473,7 @@
           {
             "kind": "RowsLayoutRow",
             "spec": {
-              "title": "CPU & Memory",
+              "title": "CPU & Load",
               "collapse": false,
               "layout": {
                 "kind": "GridLayout",
@@ -1867,8 +2484,8 @@
                       "spec": {
                         "x": 0,
                         "y": 0,
-                        "width": 8,
-                        "height": 8,
+                        "width": 12,
+                        "height": 7,
                         "element": {
                           "kind": "ElementReference",
                           "name": "panel-7"
@@ -1878,26 +2495,13 @@
                     {
                       "kind": "GridLayoutItem",
                       "spec": {
-                        "x": 8,
+                        "x": 12,
                         "y": 0,
-                        "width": 8,
-                        "height": 8,
+                        "width": 12,
+                        "height": 7,
                         "element": {
                           "kind": "ElementReference",
                           "name": "panel-8"
-                        }
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "x": 16,
-                        "y": 0,
-                        "width": 8,
-                        "height": 8,
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-9"
                         }
                       }
                     }
@@ -1909,7 +2513,7 @@
           {
             "kind": "RowsLayoutRow",
             "spec": {
-              "title": "Network & Storage",
+              "title": "Memory",
               "collapse": false,
               "layout": {
                 "kind": "GridLayout",
@@ -1920,18 +2524,45 @@
                       "spec": {
                         "x": 0,
                         "y": 0,
-                        "width": 8,
-                        "height": 8,
+                        "width": 12,
+                        "height": 7,
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-10"
+                          "name": "panel-9"
                         }
                       }
                     },
                     {
                       "kind": "GridLayoutItem",
                       "spec": {
-                        "x": 8,
+                        "x": 12,
+                        "y": 0,
+                        "width": 12,
+                        "height": 7,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-10"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "title": "Disk & Filesystem",
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
                         "y": 0,
                         "width": 8,
                         "height": 8,
@@ -1944,13 +2575,26 @@
                     {
                       "kind": "GridLayoutItem",
                       "spec": {
-                        "x": 16,
+                        "x": 8,
                         "y": 0,
                         "width": 8,
                         "height": 8,
                         "element": {
                           "kind": "ElementReference",
                           "name": "panel-12"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 16,
+                        "y": 0,
+                        "width": 8,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-13"
                         }
                       }
                     }
@@ -1962,7 +2606,47 @@
           {
             "kind": "RowsLayoutRow",
             "spec": {
-              "title": "Container Health",
+              "title": "Network",
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 12,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-14"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 12,
+                        "y": 0,
+                        "width": 12,
+                        "height": 8,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-15"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "title": "System Health",
               "collapse": false,
               "layout": {
                 "kind": "GridLayout",
@@ -1977,7 +2661,7 @@
                         "height": 7,
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-13"
+                          "name": "panel-16"
                         }
                       }
                     },
@@ -1990,7 +2674,7 @@
                         "height": 7,
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-14"
+                          "name": "panel-17"
                         }
                       }
                     },
@@ -2003,7 +2687,7 @@
                         "height": 7,
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-15"
+                          "name": "panel-18"
                         }
                       }
                     }
@@ -2019,20 +2703,22 @@
     "liveNow": false,
     "preload": false,
     "tags": [
-      "cadvisor",
-      "docker",
-      "containers",
+      "node-exporter",
+      "linux",
+      "ec2",
       "prometheus",
+      "infrastructure",
       "production"
     ],
     "timeSettings": {
       "timezone": "browser",
       "from": "now-30m",
       "to": "now",
-      "autoRefresh": "10s",
+      "autoRefresh": "15s",
       "autoRefreshIntervals": [
         "5s",
         "10s",
+        "15s",
         "30s",
         "1m",
         "5m",
@@ -2043,17 +2729,17 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "cAdvisor - Container Infrastructure",
+    "title": "Node Exporter - Linux Host Infrastructure",
     "variables": [
       {
         "kind": "QueryVariable",
         "spec": {
-          "name": "container",
+          "name": "job",
           "current": {
             "text": "All",
             "value": "$__all"
           },
-          "label": "Container",
+          "label": "Job",
           "hide": "dontHide",
           "refresh": "onDashboardLoad",
           "skipUrlSync": false,
@@ -2065,13 +2751,47 @@
               "name": "fftywdgwmoq2od"
             },
             "spec": {
-              "__legacyStringValue": "label_values(container_last_seen{image!=\"\"}, name)"
+              "__legacyStringValue": "label_values(node_uname_info, job)"
             }
           },
-          "regex": "/.+/",
+          "regex": "",
           "regexApplyTo": "value",
           "sort": "alphabeticalAsc",
-          "definition": "label_values(container_last_seen{image!=\"\"}, name)",
+          "definition": "label_values(node_uname_info, job)",
+          "options": [],
+          "multi": true,
+          "includeAll": true,
+          "allValue": ".*",
+          "allowCustomValue": false
+        }
+      },
+      {
+        "kind": "QueryVariable",
+        "spec": {
+          "name": "instance",
+          "current": {
+            "text": "All",
+            "value": "$__all"
+          },
+          "label": "Host",
+          "hide": "dontHide",
+          "refresh": "onDashboardLoad",
+          "skipUrlSync": false,
+          "query": {
+            "kind": "DataQuery",
+            "group": "prometheus",
+            "version": "v0",
+            "datasource": {
+              "name": "fftywdgwmoq2od"
+            },
+            "spec": {
+              "__legacyStringValue": "label_values(node_uname_info{job=~\"$job\"}, instance)"
+            }
+          },
+          "regex": "",
+          "regexApplyTo": "value",
+          "sort": "alphabeticalAsc",
+          "definition": "label_values(node_uname_info{job=~\"$job\"}, instance)",
           "options": [],
           "multi": true,
           "includeAll": true,
