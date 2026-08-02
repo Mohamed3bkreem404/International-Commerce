@@ -8,6 +8,7 @@
       <w>contenttypenosniff</w>
       <w>grafana</w>
       <w>letsencrypt</w>
+      <w>loki</w>
       <w>prometheus</w>
       <w>smarthost</w>
       <w>traefik</w>

@@ -31,3 +31,5 @@ volumes:
   postgres_backups:
   grafana-data:
   alertmanager-data:
+  loki-data:
+  alloy-data:
