@@ -133,7 +133,7 @@ services:
 
   loki:
     image: grafana/loki:latest
-    command: -config.file=/etc/loki/loki-config.yml
+    command: -config.file=/etc/loki/loki-config.yaml
     volumes:
       - ./grafana/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
       - loki-data:/loki
