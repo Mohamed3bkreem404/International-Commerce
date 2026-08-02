@@ -1,1405 +1,780 @@
-
-"apiVersion": "dashboard.grafana.app/v2",
-"kind": "Dashboard",
-"metadata": {
-"name": "loki-logs-production",
-"namespace": "default",
-"uid": "b09289dc-58e4-458a-96b2-259401f8e49c"
-},
-"spec": {
-"annotations": [],
-"cursorSync": "Crosshair",
-"description": "Centralized logging dashboard for the ecommerce Docker Compose platform using Grafana Alloy, Loki and Grafana.",
-"editable": true,
-"elements": {
-"panel-1": {
-"kind": "Panel",
-"spec": {
-"id": 1,
-"title": "Log Rate",
-"description": "Total log lines per second.",
-"links": [],
-"data": {
-"kind": "QueryGroup",
-"spec": {
-"queries": [
 {
-"kind": "PanelQuery",
-"spec": {
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"expr": "sum(rate({compose_project=~\"$compose_project\", service=~\"$service\"}[1m]))",
-"queryType": "range",
-"legendFormat": "__auto"
-}
-},
-"refId": "A",
-"hidden": false
-}
-}
-],
-"transformations": [],
-"queryOptions": {}
-}
-},
-"vizConfig": {
-"kind": "VizConfig",
-"group": "stat",
-"version": "13.1.0",
-"spec": {
-"options": {
-"colorMode": "value",
-"graphMode": "area",
-"justifyMode": "auto",
-"orientation": "horizontal",
-"percentChangeColorMode": "standard",
-"reduceOptions": {
-"calcs": [
-"lastNotNull"
-],
-"fields": "",
-"values": false
-},
-"showPercentChange": false,
-"textMode": "auto",
-"wideLayout": true
-},
-"fieldConfig": {
-"defaults": {
-"unit": "ops",
-"thresholds": {
-"mode": "absolute",
-"steps": [
-{
-"value": 0,
-"color": "green"
-}
-]
-},
-"color": {
-"mode": "thresholds"
-},
-"mappings": [
-{
-"type": "special",
-"options": {
-"match": "null",
-"result": {
-"text": "N/A"
-}
-}
-}
-],
-"decimals": 2
-},
-"overrides": []
-}
-}
-}
-}
-},
-"panel-2": {
-"kind": "Panel",
-"spec": {
-"id": 2,
-"title": "Error Rate",
-"description": "ERROR log lines per second.",
-"links": [],
-"data": {
-"kind": "QueryGroup",
-"spec": {
-"queries": [
-{
-"kind": "PanelQuery",
-"spec": {
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"expr": "sum(rate({compose_project=~\"$compose_project\", service=~\"$service\"} |= \"ERROR\" [5m]))",
-"queryType": "range",
-"legendFormat": "__auto"
-}
-},
-"refId": "A",
-"hidden": false
-}
-}
-],
-"transformations": [],
-"queryOptions": {}
-}
-},
-"vizConfig": {
-"kind": "VizConfig",
-"group": "stat",
-"version": "13.1.0",
-"spec": {
-"options": {
-"colorMode": "value",
-"graphMode": "area",
-"justifyMode": "auto",
-"orientation": "horizontal",
-"percentChangeColorMode": "standard",
-"reduceOptions": {
-"calcs": [
-"lastNotNull"
-],
-"fields": "",
-"values": false
-},
-"showPercentChange": false,
-"textMode": "auto",
-"wideLayout": true
-},
-"fieldConfig": {
-"defaults": {
-"unit": "ops",
-"thresholds": {
-"mode": "absolute",
-"steps": [
-{
-"value": 0,
-"color": "green"
-},
-{
-"value": 0.1,
-"color": "yellow"
-},
-{
-"value": 1,
-"color": "red"
-}
-]
-},
-"color": {
-"mode": "thresholds"
-},
-"mappings": [
-{
-"type": "special",
-"options": {
-"match": "null",
-"result": {
-"text": "N/A"
-}
-}
-}
-],
-"decimals": 3
-},
-"overrides": []
-}
-}
-}
-}
-},
-"panel-3": {
-"kind": "Panel",
-"spec": {
-"id": 3,
-"title": "Warning Rate",
-"description": "WARN log lines per second.",
-"links": [],
-"data": {
-"kind": "QueryGroup",
-"spec": {
-"queries": [
-{
-"kind": "PanelQuery",
-"spec": {
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"expr": "sum(rate({compose_project=~\"$compose_project\", service=~\"$service\"} |= \"WARN\" [5m]))",
-"queryType": "range",
-"legendFormat": "__auto"
-}
-},
-"refId": "A",
-"hidden": false
-}
-}
-],
-"transformations": [],
-"queryOptions": {}
-}
-},
-"vizConfig": {
-"kind": "VizConfig",
-"group": "stat",
-"version": "13.1.0",
-"spec": {
-"options": {
-"colorMode": "value",
-"graphMode": "area",
-"justifyMode": "auto",
-"orientation": "horizontal",
-"percentChangeColorMode": "standard",
-"reduceOptions": {
-"calcs": [
-"lastNotNull"
-],
-"fields": "",
-"values": false
-},
-"showPercentChange": false,
-"textMode": "auto",
-"wideLayout": true
-},
-"fieldConfig": {
-"defaults": {
-"unit": "ops",
-"thresholds": {
-"mode": "absolute",
-"steps": [
-{
-"value": 0,
-"color": "green"
-},
-{
-"value": 0.5,
-"color": "yellow"
-},
-{
-"value": 2,
-"color": "red"
-}
-]
-},
-"color": {
-"mode": "thresholds"
-},
-"mappings": [
-{
-"type": "special",
-"options": {
-"match": "null",
-"result": {
-"text": "N/A"
-}
-}
-}
-],
-"decimals": 3
-},
-"overrides": []
-}
-}
-}
-}
-},
-"panel-4": {
-"kind": "Panel",
-"spec": {
-"id": 4,
-"title": "Active Services",
-"description": "Services that emitted logs in the last 5 minutes.",
-"links": [],
-"data": {
-"kind": "QueryGroup",
-"spec": {
-"queries": [
-{
-"kind": "PanelQuery",
-"spec": {
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"expr": "count(count_over_time({compose_project=~\"$compose_project\", service=~\"$service\"}[5m]) > 0)",
-"queryType": "range",
-"legendFormat": "__auto"
-}
-},
-"refId": "A",
-"hidden": false
-}
-}
-],
-"transformations": [],
-"queryOptions": {}
-}
-},
-"vizConfig": {
-"kind": "VizConfig",
-"group": "stat",
-"version": "13.1.0",
-"spec": {
-"options": {
-"colorMode": "value",
-"graphMode": "area",
-"justifyMode": "auto",
-"orientation": "horizontal",
-"percentChangeColorMode": "standard",
-"reduceOptions": {
-"calcs": [
-"lastNotNull"
-],
-"fields": "",
-"values": false
-},
-"showPercentChange": false,
-"textMode": "auto",
-"wideLayout": true
-},
-"fieldConfig": {
-"defaults": {
-"unit": "short",
-"thresholds": {
-"mode": "absolute",
-"steps": [
-{
-"value": 0,
-"color": "green"
-}
-]
-},
-"color": {
-"mode": "thresholds"
-},
-"mappings": [
-{
-"type": "special",
-"options": {
-"match": "null",
-"result": {
-"text": "N/A"
-}
-}
-}
-],
-"decimals": 0
-},
-"overrides": []
-}
-}
-}
-}
-},
-"panel-5": {
-"kind": "Panel",
-"spec": {
-"id": 5,
-"title": "Log Volume by Service",
-"description": "Log throughput by service.",
-"links": [],
-"data": {
-"kind": "QueryGroup",
-"spec": {
-"queries": [
-{
-"kind": "PanelQuery",
-"spec": {
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"expr": "sum by (service) (rate({compose_project=~\"$compose_project\", service=~\"$service\"}[1m]))",
-"queryType": "range",
-"legendFormat": "{{service}}"
-}
-},
-"refId": "A",
-"hidden": false
-}
-}
-],
-"transformations": [],
-"queryOptions": {}
-}
-},
-"vizConfig": {
-"kind": "VizConfig",
-"group": "timeseries",
-"version": "13.1.0",
-"spec": {
-"options": {
-"annotations": {
-"clustering": -1,
-"multiLane": false
-},
-"legend": {
-"calcs": [
-"lastNotNull",
-"max"
-],
-"displayMode": "list",
-"enableFacetedFilter": false,
-"overflow": "ellipsis",
-"placement": "bottom",
-"showLegend": true
-},
-"tooltip": {
-"hideZeros": false,
-"mode": "multi",
-"sort": "desc"
-}
-},
-"fieldConfig": {
-"defaults": {
-"unit": "ops",
-"thresholds": {
-"mode": "absolute",
-"steps": [
-{
-"value": 0,
-"color": "green"
-}
-]
-},
-"color": {
-"mode": "palette-classic"
-},
-"custom": {
-"axisBorderShow": false,
-"axisCenteredZero": false,
-"axisColorMode": "text",
-"axisLabel": "",
-"axisPlacement": "auto",
-"barAlignment": 0,
-"barWidthFactor": 0.6,
-"drawStyle": "line",
-"fillOpacity": 14,
-"gradientMode": "none",
-"hideFrom": {
-"legend": false,
-"tooltip": false,
-"viz": false
-},
-"insertNulls": false,
-"lineInterpolation": "smooth",
-"lineWidth": 2,
-"pointSize": 4,
-"scaleDistribution": {
-"type": "linear"
-},
-"showPoints": "never",
-"showValues": false,
-"spanNulls": true,
-"stacking": {
-"group": "A",
-"mode": "none"
-},
-"thresholdsStyle": {
-"mode": "off"
-}
-},
-"decimals": 2
-},
-"overrides": []
-}
-}
-}
-}
-},
-"panel-6": {
-"kind": "Panel",
-"spec": {
-"id": 6,
-"title": "Errors by Service",
-"description": "ERROR rate by service.",
-"links": [],
-"data": {
-"kind": "QueryGroup",
-"spec": {
-"queries": [
-{
-"kind": "PanelQuery",
-"spec": {
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"expr": "sum by (service) (rate({compose_project=~\"$compose_project\", service=~\"$service\"} |= \"ERROR\" [5m]))",
-"queryType": "range",
-"legendFormat": "{{service}}"
-}
-},
-"refId": "A",
-"hidden": false
-}
-}
-],
-"transformations": [],
-"queryOptions": {}
-}
-},
-"vizConfig": {
-"kind": "VizConfig",
-"group": "timeseries",
-"version": "13.1.0",
-"spec": {
-"options": {
-"annotations": {
-"clustering": -1,
-"multiLane": false
-},
-"legend": {
-"calcs": [
-"lastNotNull",
-"max"
-],
-"displayMode": "list",
-"enableFacetedFilter": false,
-"overflow": "ellipsis",
-"placement": "bottom",
-"showLegend": true
-},
-"tooltip": {
-"hideZeros": false,
-"mode": "multi",
-"sort": "desc"
-}
-},
-"fieldConfig": {
-"defaults": {
-"unit": "ops",
-"thresholds": {
-"mode": "absolute",
-"steps": [
-{
-"value": 0,
-"color": "green"
-},
-{
-"value": 0.1,
-"color": "yellow"
-},
-{
-"value": 1,
-"color": "red"
-}
-]
-},
-"color": {
-"mode": "palette-classic"
-},
-"custom": {
-"axisBorderShow": false,
-"axisCenteredZero": false,
-"axisColorMode": "text",
-"axisLabel": "",
-"axisPlacement": "auto",
-"barAlignment": 0,
-"barWidthFactor": 0.6,
-"drawStyle": "line",
-"fillOpacity": 14,
-"gradientMode": "none",
-"hideFrom": {
-"legend": false,
-"tooltip": false,
-"viz": false
-},
-"insertNulls": false,
-"lineInterpolation": "smooth",
-"lineWidth": 2,
-"pointSize": 4,
-"scaleDistribution": {
-"type": "linear"
-},
-"showPoints": "never",
-"showValues": false,
-"spanNulls": true,
-"stacking": {
-"group": "A",
-"mode": "none"
-},
-"thresholdsStyle": {
-"mode": "off"
-}
-},
-"decimals": 3
-},
-"overrides": []
-}
-}
-}
-}
-},
-"panel-7": {
-"kind": "Panel",
-"spec": {
-"id": 7,
-"title": "Warnings by Service",
-"description": "WARN rate by service.",
-"links": [],
-"data": {
-"kind": "QueryGroup",
-"spec": {
-"queries": [
-{
-"kind": "PanelQuery",
-"spec": {
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"expr": "sum by (service) (rate({compose_project=~\"$compose_project\", service=~\"$service\"} |= \"WARN\" [5m]))",
-"queryType": "range",
-"legendFormat": "{{service}}"
-}
-},
-"refId": "A",
-"hidden": false
-}
-}
-],
-"transformations": [],
-"queryOptions": {}
-}
-},
-"vizConfig": {
-"kind": "VizConfig",
-"group": "timeseries",
-"version": "13.1.0",
-"spec": {
-"options": {
-"annotations": {
-"clustering": -1,
-"multiLane": false
-},
-"legend": {
-"calcs": [
-"lastNotNull",
-"max"
-],
-"displayMode": "list",
-"enableFacetedFilter": false,
-"overflow": "ellipsis",
-"placement": "bottom",
-"showLegend": true
-},
-"tooltip": {
-"hideZeros": false,
-"mode": "multi",
-"sort": "desc"
-}
-},
-"fieldConfig": {
-"defaults": {
-"unit": "ops",
-"thresholds": {
-"mode": "absolute",
-"steps": [
-{
-"value": 0,
-"color": "green"
-},
-{
-"value": 0.5,
-"color": "yellow"
-},
-{
-"value": 2,
-"color": "red"
-}
-]
-},
-"color": {
-"mode": "palette-classic"
-},
-"custom": {
-"axisBorderShow": false,
-"axisCenteredZero": false,
-"axisColorMode": "text",
-"axisLabel": "",
-"axisPlacement": "auto",
-"barAlignment": 0,
-"barWidthFactor": 0.6,
-"drawStyle": "line",
-"fillOpacity": 14,
-"gradientMode": "none",
-"hideFrom": {
-"legend": false,
-"tooltip": false,
-"viz": false
-},
-"insertNulls": false,
-"lineInterpolation": "smooth",
-"lineWidth": 2,
-"pointSize": 4,
-"scaleDistribution": {
-"type": "linear"
-},
-"showPoints": "never",
-"showValues": false,
-"spanNulls": true,
-"stacking": {
-"group": "A",
-"mode": "none"
-},
-"thresholdsStyle": {
-"mode": "off"
-}
-},
-"decimals": 3
-},
-"overrides": []
-}
-}
-}
-}
-},
-"panel-8": {
-"kind": "Panel",
-"spec": {
-"id": 8,
-"title": "Live Application Logs",
-"description": "Recent logs for the selected services.",
-"links": [],
-"data": {
-"kind": "QueryGroup",
-"spec": {
-"queries": [
-{
-"kind": "PanelQuery",
-"spec": {
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"expr": "{compose_project=~\"$compose_project\", service=~\"$service\"}",
-"queryType": "range",
-"legendFormat": "__auto"
-}
-},
-"refId": "A",
-"hidden": false
-}
-}
-],
-"transformations": [],
-"queryOptions": {}
-}
-},
-"vizConfig": {
-"kind": "VizConfig",
-"group": "logs",
-"version": "13.1.0",
-"spec": {
-"options": {
-"dedupStrategy": "none",
-"enableLogDetails": true,
-"prettifyLogMessage": false,
-"showCommonLabels": false,
-"showLabels": true,
-"showTime": true,
-"sortOrder": "Descending",
-"wrapLogMessage": true
-},
-"fieldConfig": {
-"defaults": {},
-"overrides": []
-}
-}
-}
-}
-},
-"panel-9": {
-"kind": "Panel",
-"spec": {
-"id": 9,
-"title": "Errors Only",
-"description": "Application log lines containing ERROR.",
-"links": [],
-"data": {
-"kind": "QueryGroup",
-"spec": {
-"queries": [
-{
-"kind": "PanelQuery",
-"spec": {
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"expr": "{compose_project=~\"$compose_project\", service=~\"$service\"} |= \"ERROR\"",
-"queryType": "range",
-"legendFormat": "__auto"
-}
-},
-"refId": "A",
-"hidden": false
-}
-}
-],
-"transformations": [],
-"queryOptions": {}
-}
-},
-"vizConfig": {
-"kind": "VizConfig",
-"group": "logs",
-"version": "13.1.0",
-"spec": {
-"options": {
-"dedupStrategy": "none",
-"enableLogDetails": true,
-"prettifyLogMessage": false,
-"showCommonLabels": false,
-"showLabels": true,
-"showTime": true,
-"sortOrder": "Descending",
-"wrapLogMessage": true
-},
-"fieldConfig": {
-"defaults": {},
-"overrides": []
-}
-}
-}
-}
-},
-"panel-10": {
-"kind": "Panel",
-"spec": {
-"id": 10,
-"title": "Warnings Only",
-"description": "Application log lines containing WARN.",
-"links": [],
-"data": {
-"kind": "QueryGroup",
-"spec": {
-"queries": [
-{
-"kind": "PanelQuery",
-"spec": {
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"expr": "{compose_project=~\"$compose_project\", service=~\"$service\"} |= \"WARN\"",
-"queryType": "range",
-"legendFormat": "__auto"
-}
-},
-"refId": "A",
-"hidden": false
-}
-}
-],
-"transformations": [],
-"queryOptions": {}
-}
-},
-"vizConfig": {
-"kind": "VizConfig",
-"group": "logs",
-"version": "13.1.0",
-"spec": {
-"options": {
-"dedupStrategy": "none",
-"enableLogDetails": true,
-"prettifyLogMessage": false,
-"showCommonLabels": false,
-"showLabels": true,
-"showTime": true,
-"sortOrder": "Descending",
-"wrapLogMessage": true
-},
-"fieldConfig": {
-"defaults": {},
-"overrides": []
-}
-}
-}
-}
-},
-"panel-11": {
-"kind": "Panel",
-"spec": {
-"id": 11,
-"title": "Traefik Logs",
-"description": "Traefik reverse-proxy logs.",
-"links": [],
-"data": {
-"kind": "QueryGroup",
-"spec": {
-"queries": [
-{
-"kind": "PanelQuery",
-"spec": {
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"expr": "{compose_project=~\"$compose_project\", service=\"traefik\"}",
-"queryType": "range",
-"legendFormat": "__auto"
-}
-},
-"refId": "A",
-"hidden": false
-}
-}
-],
-"transformations": [],
-"queryOptions": {}
-}
-},
-"vizConfig": {
-"kind": "VizConfig",
-"group": "logs",
-"version": "13.1.0",
-"spec": {
-"options": {
-"dedupStrategy": "none",
-"enableLogDetails": true,
-"prettifyLogMessage": false,
-"showCommonLabels": false,
-"showLabels": true,
-"showTime": true,
-"sortOrder": "Descending",
-"wrapLogMessage": true
-},
-"fieldConfig": {
-"defaults": {},
-"overrides": []
-}
-}
-}
-}
-},
-"panel-12": {
-"kind": "Panel",
-"spec": {
-"id": 12,
-"title": "Infrastructure Logs",
-"description": "Observability and platform service logs.",
-"links": [],
-"data": {
-"kind": "QueryGroup",
-"spec": {
-"queries": [
-{
-"kind": "PanelQuery",
-"spec": {
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"expr": "{compose_project=~\"$compose_project\", service=~\"prometheus|grafana|loki|alloy|cadvisor|node-exporter|alertmanager\"}",
-"queryType": "range",
-"legendFormat": "__auto"
-}
-},
-"refId": "A",
-"hidden": false
-}
-}
-],
-"transformations": [],
-"queryOptions": {}
-}
-},
-"vizConfig": {
-"kind": "VizConfig",
-"group": "logs",
-"version": "13.1.0",
-"spec": {
-"options": {
-"dedupStrategy": "none",
-"enableLogDetails": true,
-"prettifyLogMessage": false,
-"showCommonLabels": false,
-"showLabels": true,
-"showTime": true,
-"sortOrder": "Descending",
-"wrapLogMessage": true
-},
-"fieldConfig": {
-"defaults": {},
-"overrides": []
-}
-}
-}
-}
-}
-},
-"layout": {
-"kind": "RowsLayout",
-"spec": {
-"rows": [
-{
-"kind": "RowsLayoutRow",
-"spec": {
-"title": "Logging Overview",
-"collapse": false,
-"layout": {
-"kind": "GridLayout",
-"spec": {
-"items": [
-{
-"kind": "GridLayoutItem",
-"spec": {
-"x": 0,
-"y": 0,
-"width": 6,
-"height": 4,
-"element": {
-"kind": "ElementReference",
-"name": "panel-1"
-}
-}
-},
-{
-"kind": "GridLayoutItem",
-"spec": {
-"x": 6,
-"y": 0,
-"width": 6,
-"height": 4,
-"element": {
-"kind": "ElementReference",
-"name": "panel-2"
-}
-}
-},
-{
-"kind": "GridLayoutItem",
-"spec": {
-"x": 12,
-"y": 0,
-"width": 6,
-"height": 4,
-"element": {
-"kind": "ElementReference",
-"name": "panel-3"
-}
-}
-},
-{
-"kind": "GridLayoutItem",
-"spec": {
-"x": 18,
-"y": 0,
-"width": 6,
-"height": 4,
-"element": {
-"kind": "ElementReference",
-"name": "panel-4"
-}
-}
-}
-]
-}
-}
-}
-},
-{
-"kind": "RowsLayoutRow",
-"spec": {
-"title": "Log Trends",
-"collapse": false,
-"layout": {
-"kind": "GridLayout",
-"spec": {
-"items": [
-{
-"kind": "GridLayoutItem",
-"spec": {
-"x": 0,
-"y": 0,
-"width": 8,
-"height": 8,
-"element": {
-"kind": "ElementReference",
-"name": "panel-5"
-}
-}
-},
-{
-"kind": "GridLayoutItem",
-"spec": {
-"x": 8,
-"y": 0,
-"width": 8,
-"height": 8,
-"element": {
-"kind": "ElementReference",
-"name": "panel-6"
-}
-}
-},
-{
-"kind": "GridLayoutItem",
-"spec": {
-"x": 16,
-"y": 0,
-"width": 8,
-"height": 8,
-"element": {
-"kind": "ElementReference",
-"name": "panel-7"
-}
-}
-}
-]
-}
-}
-}
-},
-{
-"kind": "RowsLayoutRow",
-"spec": {
-"title": "Application Logs",
-"collapse": false,
-"layout": {
-"kind": "GridLayout",
-"spec": {
-"items": [
-{
-"kind": "GridLayoutItem",
-"spec": {
-"x": 0,
-"y": 0,
-"width": 24,
-"height": 12,
-"element": {
-"kind": "ElementReference",
-"name": "panel-8"
-}
-}
-}
-]
-}
-}
-}
-},
-{
-"kind": "RowsLayoutRow",
-"spec": {
-"title": "Errors & Warnings",
-"collapse": false,
-"layout": {
-"kind": "GridLayout",
-"spec": {
-"items": [
-{
-"kind": "GridLayoutItem",
-"spec": {
-"x": 0,
-"y": 0,
-"width": 12,
-"height": 10,
-"element": {
-"kind": "ElementReference",
-"name": "panel-9"
-}
-}
-},
-{
-"kind": "GridLayoutItem",
-"spec": {
-"x": 12,
-"y": 0,
-"width": 12,
-"height": 10,
-"element": {
-"kind": "ElementReference",
-"name": "panel-10"
-}
-}
-}
-]
-}
-}
-}
-},
-{
-"kind": "RowsLayoutRow",
-"spec": {
-"title": "Platform Logs",
-"collapse": false,
-"layout": {
-"kind": "GridLayout",
-"spec": {
-"items": [
-{
-"kind": "GridLayoutItem",
-"spec": {
-"x": 0,
-"y": 0,
-"width": 12,
-"height": 10,
-"element": {
-"kind": "ElementReference",
-"name": "panel-11"
-}
-}
-},
-{
-"kind": "GridLayoutItem",
-"spec": {
-"x": 12,
-"y": 0,
-"width": 12,
-"height": 10,
-"element": {
-"kind": "ElementReference",
-"name": "panel-12"
-}
-}
-}
-]
-}
-}
-}
-}
-]
-}
-},
-"links": [],
-"liveNow": true,
-"preload": false,
-"tags": [
-"loki",
-"alloy",
-"logs",
-"docker-compose",
-"ecommerce",
-"production"
-],
-"timeSettings": {
-"timezone": "browser",
-"from": "now-30m",
-"to": "now",
-"autoRefresh": "10s",
-"autoRefreshIntervals": [
-"5s",
-"10s",
-"30s",
-"1m",
-"5m",
-"15m",
-"30m",
-"1h"
-],
-"hideTimepicker": false,
-"fiscalYearStartMonth": 0
-},
-"title": "Ecommerce Logs - Loki",
-"variables": [
-{
-"kind": "QueryVariable",
-"spec": {
-"name": "compose_project",
-"current": {
-"text": "All",
-"value": "$__all"
-},
-"label": "Compose Project",
-"hide": "dontHide",
-"refresh": "onDashboardLoad",
-"skipUrlSync": false,
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"__legacyStringValue": "label_values({container=~\".+\"}, compose_project)"
-}
-},
-"regex": "",
-"regexApplyTo": "value",
-"sort": "alphabeticalAsc",
-"definition": "label_values({container=~\".+\"}, compose_project)",
-"options": [],
-"multi": true,
-"includeAll": true,
-"allValue": ".*",
-"allowCustomValue": false
-}
-},
-{
-"kind": "QueryVariable",
-"spec": {
-"name": "service",
-"current": {
-"text": "All",
-"value": "$__all"
-},
-"label": "Service",
-"hide": "dontHide",
-"refresh": "onDashboardLoad",
-"skipUrlSync": false,
-"query": {
-"kind": "DataQuery",
-"group": "loki",
-"version": "v0",
-"datasource": {
-"name": "loki"
-},
-"spec": {
-"__legacyStringValue": "label_values({compose_project=~\"$compose_project\"}, service)"
-}
-},
-"regex": "",
-"regexApplyTo": "value",
-"sort": "alphabeticalAsc",
-"definition": "label_values({compose_project=~\"$compose_project\"}, service)",
-"options": [],
-"multi": true,
-"includeAll": true,
-"allValue": ".*",
-"allowCustomValue": false
-}
-}
-]
-}
+  "id": null,
+  "uid": "ecm-loki-logs",
+  "title": "Ecommerce Logs - Loki",
+  "tags": [
+    "loki",
+    "alloy",
+    "logs",
+    "docker-compose",
+    "ecommerce",
+    "production"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 41,
+  "version": 1,
+  "refresh": "10s",
+  "editable": true,
+  "graphTooltip": 1,
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h"
+    ]
+  },
+  "description": "Centralized logging dashboard for the ecommerce Docker Compose platform using Grafana Alloy, Loki and Grafana.",
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "compose_project",
+        "label": "Compose Project",
+        "type": "query",
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "query": "label_values({container=~\".+\"}, compose_project)",
+        "definition": "label_values({container=~\".+\"}, compose_project)",
+        "refresh": 1,
+        "sort": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "options": []
+      },
+      {
+        "name": "service",
+        "label": "Service",
+        "type": "query",
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "query": "label_values({compose_project=~\"$compose_project\"}, service)",
+        "definition": "label_values({compose_project=~\"$compose_project\"}, service)",
+        "refresh": 1,
+        "sort": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "options": []
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Log Rate",
+      "description": "Total log lines per second for the selected services.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate({compose_project=~\"$compose_project\", service=~\"$service\"}[1m]))",
+          "queryType": "range",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          }
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "wideLayout": true,
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Error Rate",
+      "description": "ERROR log lines per second.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate({compose_project=~\"$compose_project\", service=~\"$service\"} |= \"ERROR\" [5m]))",
+          "queryType": "range",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          }
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "wideLayout": true,
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.1
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Warning Rate",
+      "description": "WARN log lines per second.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate({compose_project=~\"$compose_project\", service=~\"$service\"} |= \"WARN\" [5m]))",
+          "queryType": "range",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          }
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "wideLayout": true,
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.5
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Active Services",
+      "description": "Services that emitted logs during the last 5 minutes.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(count_over_time({compose_project=~\"$compose_project\", service=~\"$service\"}[5m]) > 0)",
+          "queryType": "range",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          }
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "wideLayout": true,
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Log Volume by Service",
+      "description": "Log throughput grouped by Docker Compose service.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service) (rate({compose_project=~\"$compose_project\", service=~\"$service\"}[1m]))",
+          "legendFormat": "{{service}}",
+          "queryType": "range",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          }
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 14,
+            "gradientMode": "none",
+            "spanNulls": true,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisColorMode": "text",
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Errors by Service",
+      "description": "ERROR log rate grouped by service.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 4,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service) (rate({compose_project=~\"$compose_project\", service=~\"$service\"} |= \"ERROR\" [5m]))",
+          "legendFormat": "{{service}}",
+          "queryType": "range",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          }
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 14,
+            "gradientMode": "none",
+            "spanNulls": true,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisColorMode": "text",
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Warnings by Service",
+      "description": "WARN log rate grouped by service.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 4,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service) (rate({compose_project=~\"$compose_project\", service=~\"$service\"} |= \"WARN\" [5m]))",
+          "legendFormat": "{{service}}",
+          "queryType": "range",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          }
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 14,
+            "gradientMode": "none",
+            "spanNulls": true,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisColorMode": "text",
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 8,
+      "type": "logs",
+      "title": "Live Application Logs",
+      "description": "Recent logs for the selected Compose project and service.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 24,
+        "h": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{compose_project=~\"$compose_project\", service=~\"$service\"}",
+          "queryType": "range",
+          "direction": "backward",
+          "editorMode": "code",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          }
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "id": 9,
+      "type": "logs",
+      "title": "Errors Only",
+      "description": "Application log lines containing ERROR.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{compose_project=~\"$compose_project\", service=~\"$service\"} |= \"ERROR\"",
+          "queryType": "range",
+          "direction": "backward",
+          "editorMode": "code",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          }
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "id": 10,
+      "type": "logs",
+      "title": "Warnings Only",
+      "description": "Application log lines containing WARN.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{compose_project=~\"$compose_project\", service=~\"$service\"} |= \"WARN\"",
+          "queryType": "range",
+          "direction": "backward",
+          "editorMode": "code",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          }
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "id": 11,
+      "type": "logs",
+      "title": "Traefik Logs",
+      "description": "Traefik reverse-proxy logs.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 34,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{compose_project=~\"$compose_project\", service=\"traefik\"}",
+          "queryType": "range",
+          "direction": "backward",
+          "editorMode": "code",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          }
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "id": 12,
+      "type": "logs",
+      "title": "Infrastructure Logs",
+      "description": "Monitoring and observability stack logs.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 34,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{compose_project=~\"$compose_project\", service=~\"prometheus|grafana|loki|alloy|cadvisor|node-exporter|alertmanager\"}",
+          "queryType": "range",
+          "direction": "backward",
+          "editorMode": "code",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          }
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
+    }
+  ]
 }
