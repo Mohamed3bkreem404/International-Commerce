@@ -1,3 +1,4 @@
+name: ecm
 include:
   - app.yml
   - databases.yml
