@@ -31,7 +31,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -124,7 +124,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -227,7 +227,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -330,7 +330,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -422,7 +422,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -515,7 +515,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -608,7 +608,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -737,7 +737,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -857,7 +857,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -878,7 +878,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -998,7 +998,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -1019,7 +1019,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -1139,7 +1139,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -1259,7 +1259,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -1280,7 +1280,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -1400,7 +1400,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -1521,7 +1521,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -1650,7 +1650,7 @@
                       "group": "prometheus",
                       "version": "v0",
                       "datasource": {
-                        "name": "fftywdgwmoq2od"
+                        "name": "prometheus"
                       },
                       "spec": {
                         "editorMode": "code",
@@ -2062,7 +2062,7 @@
             "group": "prometheus",
             "version": "v0",
             "datasource": {
-              "name": "fftywdgwmoq2od"
+              "name": "prometheus"
             },
             "spec": {
               "__legacyStringValue": "label_values(container_last_seen{image!=\"\"}, name)"
