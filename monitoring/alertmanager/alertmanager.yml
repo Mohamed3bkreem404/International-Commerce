@@ -1,17 +1,11 @@
-global:
-  smtp_smarthost: smtp.gmail.com:587
-  smtp_from: neutmoha@gmail.com
-  smtp_auth_username: neutmoha@gmail.com
-  smtp_auth_password: ${SMTP_PASSWORD}
-  smtp_require_tls: true
-
-
 route:
-  receiver: email-notifications
+  receiver: telegram-notifications
   group_wait: 5s
   group_interval: 10s
   repeat_interval: 1m
 receivers:
-  - name: email-notifications
-    email_configs:
-      - to: neutmoha@gmail.com
+  - name: telegram-notifications
+    telegram_configs:
+      - bot_token: "8806627768:AAGET_smgFZJ0RWGB9LA33iKrN-SJy1bAyc"
+        chat_id: 5535089238
+        send_resolved: true
