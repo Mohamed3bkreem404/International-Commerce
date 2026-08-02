@@ -1,38 +1,66 @@
 groups:
   - name: database
     rules:
-      - alert: PostgreSQLDown
-        expr: pg_up == 0
+      - alert: PostgreSQLExporterDown
+        expr: up{job="databases"} == 0
         for: 1m
         labels:
           severity: critical
+          scope: database
         annotations:
-          summary: "PostgreSQL is down"
-          description: "Prometheus cannot reach PostgreSQL."
-
-      - alert: HighDatabaseConnections
-        expr: (pg_stat_database_numbackends / pg_settings_max_connections) * 100 > 80
-        for: 2m
-        labels:
-          severity: warning
-        annotations:
-          summary: "High database connections"
-          description: "Database connections exceed 80%."
-
-      - alert: LongRunningTransactions
-        expr: pg_stat_activity_max_tx_duration > 300
-        for: 2m
-        labels:
-          severity: warning
-        annotations:
-          summary: "Long running transaction"
-          description: "A transaction has been running for more than 5 minutes."
-
-      - alert: DatabaseDeadlocks
-        expr: increase(pg_stat_database_deadlocks[5m]) > 0
+          summary: PostgreSQL exporter is down
+          description: Prometheus cannot scrape {{ $labels.instance }} for 1 minute.
+      - alert: PostgreSQLDown
+        expr: pg_up{job="databases"} == 0
         for: 1m
         labels:
-          severity: warning
+          severity: critical
+          scope: database
         annotations:
-          summary: "Database deadlocks detected"
-          description: "Deadlocks have occurred during the last 5 minutes."
+          summary: PostgreSQL is unreachable
+          description: Exporter {{ $labels.instance }} cannot connect to its PostgreSQL
+            database.
+      - alert: HighDatabaseConnections
+        expr: 100 * sum by (instance) (pg_stat_database_numbackends{job="databases",datname!~"template.*"})
+          / clamp_min(max by (instance) (pg_settings_max_connections{job="databases"}),
+          1) > 80
+        for: 5m
+        labels:
+          severity: warning
+          scope: database
+        annotations:
+          summary: High PostgreSQL connection usage
+          description: '{{ $labels.instance }} is using more than 80% of max PostgreSQL
+        connections.'
+      - alert: PostgreSQLDeadlocks
+        expr: sum by (instance) (increase(pg_stat_database_deadlocks{job="databases",datname!~"template.*"}[5m]))
+          > 0
+        for: 0m
+        labels:
+          severity: warning
+          scope: database
+        annotations:
+          summary: PostgreSQL deadlock detected
+          description: Deadlocks were detected on {{ $labels.instance }} during the last
+            5 minutes.
+      - alert: LongRunningTransaction
+        expr: pg_stat_activity_max_tx_duration{job="databases"} > 300
+        for: 2m
+        labels:
+          severity: warning
+          scope: database
+        annotations:
+          summary: Long-running PostgreSQL transaction
+          description: A transaction on {{ $labels.instance }} has been running for more
+            than 5 minutes.
+      - alert: PostgreSQLDatabaseSizeHigh
+        expr: pg_database_size_bytes{job="databases",datname!~"template.*"} > 10 * 1024
+          * 1024 * 1024
+        for: 15m
+        labels:
+          severity: warning
+          scope: database
+        annotations:
+          summary: Large PostgreSQL database
+          description: Database {{ $labels.datname }} on {{ $labels.instance }} is larger
+            than 10 GiB.

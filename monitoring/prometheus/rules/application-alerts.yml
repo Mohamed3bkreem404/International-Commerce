@@ -1,63 +1,91 @@
 groups:
   - name: application
     rules:
-      - alert: ServiceDown
-        expr: up == 0
-        for: 5s
+      - alert: ApplicationServiceDown
+        expr: up{job="applications"} == 0
+        for: 1m
         labels:
           severity: critical
+          scope: application
         annotations:
-          summary: "{{ $labels.job }} is down"
-          description: "{{ $labels.job }} has been unreachable for 1 minute."
-      - alert: HighCPUUsage
-        expr: rate(container_cpu_usage_seconds_total{name!=""}[2m]) * 100 > 80
-        for: 2m
+          summary: '{{ $labels.application }} is down'
+          description: Prometheus cannot scrape {{ $labels.application }} at {{ $labels.instance
+            }} for 1 minute.
+      - alert: HighApplicationCPU
+        expr: 100 * process_cpu_usage{job="applications"} > 80
+        for: 5m
         labels:
           severity: warning
+          scope: application
         annotations:
-          summary: "High CPU Usage"
-          description: "{{ $labels.name }} CPU usage is above 80%."
-      - alert: HighMemoryUsage
-        expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""}) * 100 > 80
-        for: 2m
+          summary: High CPU usage on {{ $labels.application }}
+          description: '{{ $labels.application }} process CPU usage has been above 80%
+        for 5 minutes.'
+      - alert: HighJVMHeapUsage
+        expr: 100 * sum by (application, instance) (jvm_memory_used_bytes{job="applications",area="heap"})
+          / clamp_min(sum by (application, instance) (jvm_memory_max_bytes{job="applications",area="heap"}),
+          1) > 85
+        for: 5m
         labels:
           severity: warning
+          scope: application
         annotations:
-          summary: "High Memory Usage"
-          description: "{{ $labels.name }} memory usage is above 80%."
-      - alert: HighResponseTime
-        expr: (
-          rate(http_server_requests_seconds_sum[2m])
-          /
-          rate(http_server_requests_seconds_count[2m])
-          ) > 1
-        for: 2m
+          summary: High JVM heap usage on {{ $labels.application }}
+          description: '{{ $labels.application }} JVM heap usage is above 85% on {{ $labels.instance
+        }}.'
+      - alert: HighHTTPResponseTime
+        expr: sum by (application) (rate(http_server_requests_seconds_sum{job="applications"}[5m]))
+          / clamp_min(sum by (application) (rate(http_server_requests_seconds_count{job="applications"}[5m])),
+          0.001) > 1
+        for: 5m
         labels:
           severity: warning
+          scope: application
         annotations:
-          summary: "High Response Time"
-          description: "Average response time exceeded 1 second."
-      - alert: HighErrorRate
-        expr: (
-          sum(rate(http_server_requests_seconds_count{status=~"5.."}[2m]))
-          /
-          sum(rate(http_server_requests_seconds_count[2m]))
-          ) * 100 > 5
-        for: 2m
+          summary: High response time on {{ $labels.application }}
+          description: '{{ $labels.application }} average HTTP response time has exceeded
+        1 second for 5 minutes.'
+      - alert: HighHTTP5xxErrorRate
+        expr: 100 * sum by (application) (rate(http_server_requests_seconds_count{job="applications",status=~"5.."}[5m]))
+          / clamp_min(sum by (application) (rate(http_server_requests_seconds_count{job="applications"}[5m])),
+          0.001) > 5
+        for: 3m
         labels:
           severity: critical
+          scope: application
         annotations:
-          summary: "High Error Rate"
-          description: "5xx errors exceed 5%."
-      - alert: HighJVMHeap
-        expr: (
-          jvm_memory_used_bytes{area="heap"}
-          /
-          jvm_memory_max_bytes{area="heap"}
-          ) * 100 > 80
-        for: 2m
+          summary: High 5xx error rate on {{ $labels.application }}
+          description: '{{ $labels.application }} 5xx error rate has exceeded 5% for 3
+        minutes.'
+      - alert: HighHTTP4xxErrorRate
+        expr: 100 * sum by (application) (rate(http_server_requests_seconds_count{job="applications",status=~"4.."}[5m]))
+          / clamp_min(sum by (application) (rate(http_server_requests_seconds_count{job="applications"}[5m])),
+          0.001) > 20
+        for: 5m
         labels:
           severity: warning
+          scope: application
         annotations:
-          summary: "High JVM Heap"
-          description: "Heap usage exceeded 80%."
+          summary: High 4xx error rate on {{ $labels.application }}
+          description: '{{ $labels.application }} 4xx error rate has exceeded 20% for
+        5 minutes.'
+      - alert: TooManyLiveThreads
+        expr: jvm_threads_live_threads{job="applications"} > 300
+        for: 5m
+        labels:
+          severity: warning
+          scope: application
+        annotations:
+          summary: High JVM thread count on {{ $labels.application }}
+          description: '{{ $labels.application }} has more than 300 live JVM threads on
+        {{ $labels.instance }}.'
+      - alert: FrequentGCPauses
+        expr: rate(jvm_gc_pause_seconds_count{job="applications"}[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+          scope: application
+        annotations:
+          summary: Frequent GC pauses on {{ $labels.application }}
+          description: '{{ $labels.application }} is averaging more than one GC pause
+        per second.'

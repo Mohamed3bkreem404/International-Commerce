@@ -1,0 +1,120 @@
+groups:
+  - name: infrastructure
+    rules:
+      - alert: NodeExporterDown
+        expr: up{job="node-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          scope: infrastructure
+        annotations:
+          summary: Node Exporter is down
+          description: Prometheus cannot scrape Node Exporter at {{ $labels.instance }}.
+      - alert: CAdvisorDown
+        expr: up{job="cadvisor"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          scope: infrastructure
+        annotations:
+          summary: cAdvisor is down
+          description: Prometheus cannot scrape cAdvisor at {{ $labels.instance }}.
+      - alert: TraefikMetricsDown
+        expr: up{job="traefik"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          scope: infrastructure
+        annotations:
+          summary: Traefik metrics endpoint is down
+          description: Prometheus cannot scrape Traefik at {{ $labels.instance }}.
+      - alert: HostHighCPU
+        expr: 100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{job="node-exporter",mode="idle"}[5m])))
+          > 85
+        for: 10m
+        labels:
+          severity: warning
+          scope: infrastructure
+        annotations:
+          summary: High host CPU usage
+          description: Host {{ $labels.instance }} CPU usage has been above 85% for 10
+            minutes.
+      - alert: HostHighMemory
+        expr: 100 * (1 - (node_memory_MemAvailable_bytes{job="node-exporter"} / node_memory_MemTotal_bytes{job="node-exporter"}))
+          > 85
+        for: 10m
+        labels:
+          severity: warning
+          scope: infrastructure
+        annotations:
+          summary: High host memory usage
+          description: Host {{ $labels.instance }} memory usage has been above 85% for
+            10 minutes.
+      - alert: HostDiskSpaceLow
+        expr: 100 * (1 - (node_filesystem_avail_bytes{job="node-exporter",fstype!~"tmpfs|overlay|squashfs",mountpoint!~"/run.*|/var/lib/docker.*"}
+          / node_filesystem_size_bytes{job="node-exporter",fstype!~"tmpfs|overlay|squashfs",mountpoint!~"/run.*|/var/lib/docker.*"}))
+          > 85
+        for: 10m
+        labels:
+          severity: warning
+          scope: infrastructure
+        annotations:
+          summary: Filesystem usage above 85%
+          description: '{{ $labels.mountpoint }} on {{ $labels.instance }} is more than
+        85% full.'
+      - alert: HostDiskSpaceCritical
+        expr: 100 * (1 - (node_filesystem_avail_bytes{job="node-exporter",fstype!~"tmpfs|overlay|squashfs",mountpoint!~"/run.*|/var/lib/docker.*"}
+          / node_filesystem_size_bytes{job="node-exporter",fstype!~"tmpfs|overlay|squashfs",mountpoint!~"/run.*|/var/lib/docker.*"}))
+          > 95
+        for: 5m
+        labels:
+          severity: critical
+          scope: infrastructure
+        annotations:
+          summary: Filesystem critically full
+          description: '{{ $labels.mountpoint }} on {{ $labels.instance }} is more than
+        95% full.'
+      - alert: HostHighLoad
+        expr: node_load5{job="node-exporter"} / clamp_min(count without (cpu, mode) (node_cpu_seconds_total{job="node-exporter",mode="idle"}),
+          1) > 1.5
+        for: 10m
+        labels:
+          severity: warning
+          scope: infrastructure
+        annotations:
+          summary: High host load average
+          description: 5-minute load average on {{ $labels.instance }} is high relative
+            to available CPU cores.
+      - alert: ContainerOOMEvent
+        expr: sum by (name) (increase(container_oom_events_total{job="cadvisor",name!=""}[5m]))
+          > 0
+        for: 0m
+        labels:
+          severity: critical
+          scope: infrastructure
+        annotations:
+          summary: Container OOM event
+          description: Container {{ $labels.name }} experienced an out-of-memory event
+            in the last 5 minutes.
+      - alert: HighContainerCPU
+        expr: 100 * sum by (name) (rate(container_cpu_usage_seconds_total{job="cadvisor",name=~".*(frontend|api-gateway|user-service|product-service|cart-service|order-service|payment-service).*"}[5m]))
+          > 80
+        for: 5m
+        labels:
+          severity: warning
+          scope: infrastructure
+        annotations:
+          summary: High container CPU usage
+          description: '{{ $labels.name }} is consuming more than 80% of one CPU core
+        for 5 minutes.'
+      - alert: TraefikHigh5xxRate
+        expr: 100 * sum(rate(traefik_entrypoint_requests_total{job="traefik",code=~"5.."}[5m]))
+          / clamp_min(sum(rate(traefik_entrypoint_requests_total{job="traefik"}[5m])),
+          0.001) > 5
+        for: 5m
+        labels:
+          severity: critical
+          scope: infrastructure
+        annotations:
+          summary: High Traefik 5xx rate
+          description: Traefik 5xx response rate has exceeded 5% for 5 minutes.
