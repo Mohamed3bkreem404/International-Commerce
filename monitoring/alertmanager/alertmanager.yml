@@ -11,11 +11,19 @@ receivers:
         send_resolved: true
         parse_mode: HTML
         message: |
-          <b>{{ .Status | toUpper }}</b>
+          {{ if eq .Status "firing" }}🚨 <b>FIRING</b>{{ else }}✅ <b>RESOLVED</b>{{ end }}
+          
+          <b>Alert:</b> {{ .CommonLabels.alertname }}
+          <b>Severity:</b> {{ .CommonLabels.severity }}
+          <b>Scope:</b> {{ .CommonLabels.scope }}
+          {{ if .CommonLabels.application }}<b>Application:</b> {{ .CommonLabels.application }}{{ end }}
+          {{ if .CommonLabels.name }}<b>Container:</b> {{ .CommonLabels.name }}{{ end }}
+          {{ if .CommonLabels.datname }}<b>Database:</b> {{ .CommonLabels.datname }}{{ end }}
+          {{ if .CommonLabels.mountpoint }}<b>Mount:</b> {{ .CommonLabels.mountpoint }}{{ end }}
+          {{ if .CommonLabels.instance }}<b>Instance:</b> {{ .CommonLabels.instance }}{{ end }}
           
           {{ range .Alerts }}
-          <b>Alert:</b> {{ .Labels.alertname }}
-          <b>Severity:</b> {{ .Labels.severity }}
-          <b>Instance:</b> {{ .Labels.instance }}
           <b>Summary:</b> {{ .Annotations.summary }}
+          <b>Details:</b> {{ .Annotations.description }}
+          {{ if .Annotations.action }}<b>Action:</b> {{ .Annotations.action }}{{ end }}
           {{ end }}

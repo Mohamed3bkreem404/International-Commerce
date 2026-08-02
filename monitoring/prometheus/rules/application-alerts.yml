@@ -8,9 +8,10 @@ groups:
           severity: critical
           scope: application
         annotations:
-          summary: '{{ $labels.application }} is down'
-          description: Prometheus cannot scrape {{ $labels.application }} at {{ $labels.instance
-            }} for 1 minute.
+          summary: "Application service is down"
+          description: "{{ $labels.application }} at {{ $labels.instance }} has not been reachable by Prometheus for 1 minute."
+          action: "Check container status, health endpoint, application logs, and Docker network."
+
       - alert: HighApplicationCPU
         expr: 100 * process_cpu_usage{job="applications"} > 80
         for: 5m
@@ -18,74 +19,107 @@ groups:
           severity: warning
           scope: application
         annotations:
-          summary: High CPU usage on {{ $labels.application }}
-          description: '{{ $labels.application }} process CPU usage has been above 80%
-        for 5 minutes.'
+          summary: "High application CPU"
+          description: "{{ $labels.application }} CPU usage is above 80% on {{ $labels.instance }}."
+          action: "Check request load, JVM activity, hot endpoints, and container CPU usage."
+
       - alert: HighJVMHeapUsage
-        expr: 100 * sum by (application, instance) (jvm_memory_used_bytes{job="applications",area="heap"})
-          / clamp_min(sum by (application, instance) (jvm_memory_max_bytes{job="applications",area="heap"}),
-          1) > 85
+        expr: |
+          100 *
+          sum by (application, instance) (jvm_memory_used_bytes{job="applications",area="heap"})
+          /
+          clamp_min(sum by (application, instance) (jvm_memory_max_bytes{job="applications",area="heap"}), 1)
+          > 85
         for: 5m
         labels:
           severity: warning
           scope: application
         annotations:
-          summary: High JVM heap usage on {{ $labels.application }}
-          description: '{{ $labels.application }} JVM heap usage is above 85% on {{ $labels.instance
-        }}.'
+          summary: "High JVM heap usage"
+          description: "{{ $labels.application }} heap usage is above 85% on {{ $labels.instance }}."
+          action: "Check GC activity, allocation rate, traffic growth, and possible memory leaks."
+
+      - alert: CriticalJVMHeapUsage
+        expr: |
+          100 *
+          sum by (application, instance) (jvm_memory_used_bytes{job="applications",area="heap"})
+          /
+          clamp_min(sum by (application, instance) (jvm_memory_max_bytes{job="applications",area="heap"}), 1)
+          > 95
+        for: 2m
+        labels:
+          severity: critical
+          scope: application
+        annotations:
+          summary: "Critical JVM heap usage"
+          description: "{{ $labels.application }} heap usage is above 95% on {{ $labels.instance }}."
+          action: "Inspect heap pressure and GC immediately; prepare restart/rollback if the service becomes unstable."
+
       - alert: HighHTTPResponseTime
-        expr: sum by (application) (rate(http_server_requests_seconds_sum{job="applications"}[5m]))
-          / clamp_min(sum by (application) (rate(http_server_requests_seconds_count{job="applications"}[5m])),
-          0.001) > 1
+        expr: |
+          sum by (application) (rate(http_server_requests_seconds_sum{job="applications"}[5m]))
+          /
+          clamp_min(sum by (application) (rate(http_server_requests_seconds_count{job="applications"}[5m])), 0.001)
+          > 1
         for: 5m
         labels:
           severity: warning
           scope: application
         annotations:
-          summary: High response time on {{ $labels.application }}
-          description: '{{ $labels.application }} average HTTP response time has exceeded
-        1 second for 5 minutes.'
+          summary: "Slow HTTP responses"
+          description: "{{ $labels.application }} average response time is above 1 second."
+          action: "Check downstream services, PostgreSQL, external calls, CPU, and recent deployments."
+
       - alert: HighHTTP5xxErrorRate
-        expr: 100 * sum by (application) (rate(http_server_requests_seconds_count{job="applications",status=~"5.."}[5m]))
-          / clamp_min(sum by (application) (rate(http_server_requests_seconds_count{job="applications"}[5m])),
-          0.001) > 5
+        expr: |
+          100 *
+          sum by (application) (rate(http_server_requests_seconds_count{job="applications",status=~"5.."}[5m]))
+          /
+          clamp_min(sum by (application) (rate(http_server_requests_seconds_count{job="applications"}[5m])), 0.001)
+          > 5
         for: 3m
         labels:
           severity: critical
           scope: application
         annotations:
-          summary: High 5xx error rate on {{ $labels.application }}
-          description: '{{ $labels.application }} 5xx error rate has exceeded 5% for 3
-        minutes.'
+          summary: "High HTTP 5xx error rate"
+          description: "{{ $labels.application }} is returning more than 5% HTTP 5xx responses."
+          action: "Open Loki logs for the service, inspect stack traces and dependencies, then rollback if linked to a release."
+
       - alert: HighHTTP4xxErrorRate
-        expr: 100 * sum by (application) (rate(http_server_requests_seconds_count{job="applications",status=~"4.."}[5m]))
-          / clamp_min(sum by (application) (rate(http_server_requests_seconds_count{job="applications"}[5m])),
-          0.001) > 20
-        for: 5m
+        expr: |
+          100 *
+          sum by (application) (rate(http_server_requests_seconds_count{job="applications",status=~"4.."}[5m]))
+          /
+          clamp_min(sum by (application) (rate(http_server_requests_seconds_count{job="applications"}[5m])), 0.001)
+          > 20
+        for: 10m
         labels:
           severity: warning
           scope: application
         annotations:
-          summary: High 4xx error rate on {{ $labels.application }}
-          description: '{{ $labels.application }} 4xx error rate has exceeded 20% for
-        5 minutes.'
+          summary: "High HTTP 4xx error rate"
+          description: "{{ $labels.application }} is returning more than 20% HTTP 4xx responses."
+          action: "Check authentication failures, bad routes, frontend/API contract issues, and suspicious client traffic."
+
       - alert: TooManyLiveThreads
         expr: jvm_threads_live_threads{job="applications"} > 300
-        for: 5m
+        for: 10m
         labels:
           severity: warning
           scope: application
         annotations:
-          summary: High JVM thread count on {{ $labels.application }}
-          description: '{{ $labels.application }} has more than 300 live JVM threads on
-        {{ $labels.instance }}.'
+          summary: "High JVM thread count"
+          description: "{{ $labels.application }} has more than 300 live threads on {{ $labels.instance }}."
+          action: "Check blocked threads, thread pools, downstream latency, and thread leaks."
+
       - alert: FrequentGCPauses
         expr: rate(jvm_gc_pause_seconds_count{job="applications"}[5m]) > 1
-        for: 5m
+        for: 10m
         labels:
           severity: warning
           scope: application
         annotations:
-          summary: Frequent GC pauses on {{ $labels.application }}
-          description: '{{ $labels.application }} is averaging more than one GC pause
-        per second.'
+          summary: "Frequent JVM GC pauses"
+          description: "{{ $labels.application }} is averaging more than one GC pause per second."
+          action: "Inspect heap pressure, allocation rate, GC duration, and JVM memory sizing."
