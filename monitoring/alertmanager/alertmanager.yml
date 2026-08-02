@@ -9,3 +9,13 @@ receivers:
       - bot_token: "8806627768:AAGET_smgFZJ0RWGB9LA33iKrN-SJy1bAyc"
         chat_id: 5535089238
         send_resolved: true
+        parse_mode: HTML
+        message: |
+          <b>{{ .Status | toUpper }}</b>
+          
+          {{ range .Alerts }}
+          <b>Alert:</b> {{ .Labels.alertname }}
+          <b>Severity:</b> {{ .Labels.severity }}
+          <b>Instance:</b> {{ .Labels.instance }}
+          <b>Summary:</b> {{ .Annotations.summary }}
+          {{ end }}
