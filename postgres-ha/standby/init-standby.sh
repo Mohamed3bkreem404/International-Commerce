@@ -19,6 +19,8 @@ if [ ! -s "$DATA_DIR/PG_VERSION" ]; then
         -R
 fi
 
+chmod 700 "$DATA_DIR"
+
 echo "Starting PostgreSQL standby..."
 
 exec postgres
