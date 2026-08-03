@@ -134,4 +134,35 @@ services:
 
     networks:
       - database-net
+  order_db_standby:
+    image: postgres:15
+
+    user: postgres
+
+    environment:
+      PGPASSWORD: replica_pass
+
+    volumes:
+      - order_standby_data:/var/lib/postgresql/data
+      - ./postgres-ha/standby/init-standby.sh:/usr/local/bin/init-standby.sh:ro
+
+    entrypoint: [ "/bin/bash", "/usr/local/bin/init-standby.sh" ]
+
+    depends_on:
+      order_db:
+        condition: service_healthy
+
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d order_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+    networks:
+      - database-net
+
+    cpus: '.1'
+    mem_limit: 70m
+    restart: unless-stopped
   
