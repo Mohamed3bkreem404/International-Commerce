@@ -144,7 +144,7 @@ services:
 
     volumes:
       - order_standby_data:/var/lib/postgresql/data
-      - ./postgres-ha/standby/init-standby.sh:/usr/local/bin/init-standby.sh:ro
+      - ../postgres-ha/standby/init-standby.sh:/usr/local/bin/init-standby.sh:ro
 
     entrypoint: [ "/bin/bash", "/usr/local/bin/init-standby.sh" ]
 
