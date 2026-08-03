@@ -34,3 +34,4 @@ volumes:
   loki-data:
   alloy-data:
   order_standby_data:
+  etcd_data:
