@@ -41,28 +41,34 @@ services:
     restart: unless-stopped
 
   order_db:
-    image: postgres:15
+    build:
+      context: ../postgres-ha/patroni
+      dockerfile: Dockerfile
+
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 4015
-      POSTGRES_DB: order_db
+      POSTGRES_DB: haproxy
+
     volumes:
       - order_data:/var/lib/postgresql/data
-      - ../postgres-ha/primary/postgresql.conf:/etc/postgresql/postgresql.conf:ro
-      - ../postgres-ha/primary/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      - ../postgres-ha/patroni/patroni-primary.yml:/etc/patroni.yml:ro
 
-    command: "postgres -c config_file=/etc/postgresql/postgresql.conf -c hba_file=/etc/postgresql/pg_hba.conf"
+
+    depends_on:
+      etcd:
+        condition: service_started
 
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d order_db" ]
+      test: [ "CMD-SHELL", "curl -sf http://localhost:8008/health || exit 1" ]
       interval: 5s
       timeout: 5s
       retries: 10
-      start_period: 10s
+      start_period: 15s
+
     networks:
       - database-net
-    cpus: '.1'
-    mem_limit: 70m
+
     restart: unless-stopped
 
   cart_db:
@@ -134,36 +140,33 @@ services:
 
     networks:
       - database-net
+
+
   order_db_standby:
-    image: postgres:15
-
-    user: postgres
-
-    environment:
-      PGPASSWORD: replica_pass
+    build:
+      context: ../postgres-ha/patroni
+      dockerfile: Dockerfile
 
     volumes:
       - order_standby_data:/var/lib/postgresql/data
-      - ../postgres-ha/standby/init-standby.sh:/usr/local/bin/init-standby.sh:ro
-
-    entrypoint: [ "/bin/bash", "/usr/local/bin/init-standby.sh" ]
+      - ../postgres-ha/patroni/patroni-standby.yml:/etc/patroni.yml:ro
 
     depends_on:
+      etcd:
+        condition: service_started
       order_db:
-        condition: service_healthy
+        condition: service_started
 
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d order_db" ]
+      test: [ "CMD-SHELL", "curl -sf http://localhost:8008/health || exit 1" ]
       interval: 5s
       timeout: 5s
       retries: 10
-      start_period: 10s
+      start_period: 15s
 
     networks:
       - database-net
 
-    cpus: '.1'
-    mem_limit: 70m
     restart: unless-stopped
 
   etcd:
@@ -173,6 +176,23 @@ services:
 
     volumes:
       - etcd_data:/etcd-data
+
+    networks:
+      - database-net
+
+    restart: unless-stopped
+
+  haproxy:
+    image: haproxy:3.1
+
+    volumes:
+      - ../postgres-ha/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+
+    depends_on:
+      order_db:
+        condition: service_started
+      order_db_standby:
+        condition: service_started
 
     networks:
       - database-net
