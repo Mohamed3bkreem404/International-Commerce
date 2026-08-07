@@ -101,7 +101,7 @@ services:
   order-service:
     image: ineutrono/ecm-order-service
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://order_db:5432/order_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://haproxy:5432/order_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=4015
       - CART_SERVICE_URL=http://cart-service:9003
