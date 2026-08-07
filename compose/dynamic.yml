@@ -22,7 +22,7 @@ http:
         burst: 50
 
     compress:
-      compress: {}
+      compress: { }
 
 
 #    #future middlewares

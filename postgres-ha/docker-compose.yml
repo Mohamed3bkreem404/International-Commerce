@@ -1,0 +1,93 @@
+services:
+
+  etcd:
+    image: gcr.io/etcd-development/etcd:v3.5.21
+
+    command: >
+      /usr/local/bin/etcd
+      --name etcd1
+      --data-dir /etcd-data
+      --listen-client-urls http://0.0.0.0:2379
+      --advertise-client-urls http://etcd:2379
+      --listen-peer-urls http://0.0.0.0:2380
+      --initial-advertise-peer-urls http://etcd:2380
+      --initial-cluster etcd1=http://etcd:2380
+      --initial-cluster-state new
+
+    volumes:
+      - etcd_data:/etcd-data
+
+    networks:
+      - postgres-ha-net
+
+    restart: unless-stopped
+
+
+  order_db:
+    build:
+      context: ./patroni
+      dockerfile: Dockerfile
+
+    volumes:
+      - order_primary_data:/var/lib/postgresql/data
+      - ./patroni/patroni-primary.yml:/etc/patroni.yml:ro
+
+    depends_on:
+      etcd:
+        condition: service_started
+
+    networks:
+      - postgres-ha-net
+
+    restart: unless-stopped
+
+
+  order_db_standby:
+    build:
+      context: ./patroni
+      dockerfile: Dockerfile
+
+    volumes:
+      - order_standby_data:/var/lib/postgresql/data
+      - ./patroni/patroni-standby.yml:/etc/patroni.yml:ro
+
+    depends_on:
+      etcd:
+        condition: service_started
+      order_db:
+        condition: service_started
+
+    networks:
+      - postgres-ha-net
+
+    restart: unless-stopped
+
+
+  haproxy:
+    image: haproxy:3.1
+
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+
+    ports:
+      - "5433:5432"
+
+    depends_on:
+      - order_db
+      - order_db_standby
+
+    networks:
+      - postgres-ha-net
+
+    restart: unless-stopped
+
+
+volumes:
+  etcd_data:
+  order_primary_data:
+  order_standby_data:
+
+
+networks:
+  postgres-ha-net:
+    driver: bridge

@@ -48,7 +48,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 4015
-      POSTGRES_DB: haproxy
+      POSTGRES_DB: order_db
 
     volumes:
       - order_data:/var/lib/postgresql/data
