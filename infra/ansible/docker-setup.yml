@@ -77,22 +77,22 @@
       groups: docker
       append: true
 
-  - name: Install cloud-guest-utils
-    ansible.builtin.apt:
-      name: cloud-guest-utils
-      state: present
-      update_cache: yes
-
-  - name: Expand root partition
-    ansible.builtin.command:
-      cmd: growpart /dev/nvme0n1 1
-    register: growpart_result
-    changed_when: "'CHANGED' in growpart_result.stdout"
-    failed_when:
-      - growpart_result.rc != 0
-      - "'NOCHANGE' not in growpart_result.stdout"
-
-  - name: Resize ext4 filesystem
-    ansible.builtin.command:
-      cmd: resize2fs /dev/nvme0n1p1
-    when: growpart_result.changed
+#  - name: Install cloud-guest-utils
+#    ansible.builtin.apt:
+#      name: cloud-guest-utils
+#      state: present
+#      update_cache: yes
+#
+#  - name: Expand root partition
+#    ansible.builtin.command:
+#      cmd: growpart /dev/nvme0n1 1
+#    register: growpart_result
+#    changed_when: "'CHANGED' in growpart_result.stdout"
+#    failed_when:
+#      - growpart_result.rc != 0
+#      - "'NOCHANGE' not in growpart_result.stdout"
+#
+#  - name: Resize ext4 filesystem
+#    ansible.builtin.command:
+#      cmd: resize2fs /dev/nvme0n1p1
+#    when: growpart_result.changed
