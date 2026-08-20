@@ -4,6 +4,9 @@
 *.tfstate.*
 .terraform.lock.hcl
 
+# Ansible
+/infra/ansible/vault.pass
+
 # AWS CLI downloaded files
 infra/terraform/aws/
 infra/terraform/awscliv2.zip
