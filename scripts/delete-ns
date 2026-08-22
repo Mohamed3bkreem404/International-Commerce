@@ -1,4 +1,0 @@
-#!/bin/bash
-kubectl delete ns test
-helm uninstall ecommerce -n argocd
-kubectl create ns test

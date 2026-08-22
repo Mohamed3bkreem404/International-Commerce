@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Values.monitoring.name}}
+  namespace: {{ .Values.namespace}}
+spec:
+  project: {{ .Values.monitoring.name}}-project
+  source:
+    repoURL: {{ .Values.monitoring.source.targetRevision}}
+    targetRevision: {{ .Values.monitoring.source.targetRevision}}
+    path: {{ .Values.monitoring.source.path}}
+  destination:
+    server: {{ .Values.monitoring.destination.server}}
+    namespace: {{ .Values.monitoring.destination.namespace}}
+  syncPolicy:
+    automated:
+      prune: {{ .Values.monitoring.syncPolicy.prune}}
+      selfHeal: {{ .Values.monitoring.syncPolicy.selfHeal}}

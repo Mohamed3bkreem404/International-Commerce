@@ -6,13 +6,14 @@ metadata:
 spec:
   project: {{ .Values.application.name}}-project
   source:
-    repoURL: {{ .Values.source.repoURL}}
-    targetRevision: {{ .Values.source.targetRevision}}
-    path: {{ .Values.source.path}}
+    repoURL: {{ .Values.application.source.repoURL}}
+    #branch
+    targetRevision: {{ .Values.application.source.targetRevision}}
+    path: {{ .Values.application.source.path}}
   destination:
-    server: {{ .Values.destination.server}}
-    namespace: {{.Values.destination.namespace}}
+    server: {{ .Values.application.destination.server}}
+    namespace: {{.Values.application.destination.namespace}}
   syncPolicy:
     automated:
-      prune: {{ .Values.syncPolicy.prune}}
-      selfHeal: {{ .Values.syncPolicy.selfHeal}}
+      prune: {{ .Values.application.syncPolicy.prune}}
+      selfHeal: {{ .Values.application.syncPolicy.selfHeal}}

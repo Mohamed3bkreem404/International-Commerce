@@ -7,10 +7,10 @@ spec:
   description: Simple project for ecommerce app
 
   sourceRepos:
-    - {{.Values.source.repoURL}}
+    - {{.Values.application.source.repoURL}}
   destinations:
-    - namespace: {{ .Values.destination.namespace}}
-      server: {{ .Values.destination.server}}
+    - namespace: {{ .Values.application.destination.namespace}}
+      server: {{ .Values.application.destination.server}}
       #Here permit charts to create ns
 {{/*  clusterResourceBlacklist:*/}}
 {{/*    - group: ""*/}}
