@@ -1,0 +1,34 @@
+node-name: {{ node_name }}
+
+node-ip: {{ rke2_node_ip }}
+
+kubelet-arg:
+  - "node-ip={{ rke2_node_ip }}"
+
+advertise-address: {{ advertise_address }}
+
+token: {{ rke2_token }}
+
+{% if rke2_bootstrap %}
+cluster-init: true
+{% else %}
+server: https://{{ rke2_server_endpoint }}:9345
+{% endif %}
+
+tls-san:
+{% for san in rke2_tls_sans %}
+  - {{ san }}
+{% endfor %}
+
+cluster-cidr: {{ rke2_cluster_cidr }}
+service-cidr: {{ rke2_service_cidr }}
+cluster-dns: {{ rke2_cluster_dns }}
+cluster-domain: {{ rke2_cluster_domain }}
+
+cni: {{ rke2_cni }}
+disable-kube-proxy: {{ rke2_disable_kube_proxy }}
+
+write-kubeconfig-mode: "0644"
+
+disable:
+  - rke2-ingress-nginx

@@ -1,0 +1,28 @@
+all:
+  children:
+    rke2_servers:
+      hosts:
+
+        node1:
+          ansible_host: 100.80.37.13
+          ansible_user: ubuntu
+          node_name: firstvm
+          rke2_node_ip: 172.17.0.6
+          advertise_address: 172.16.0.7
+          rke2_bootstrap: true
+
+        node2:
+          ansible_host: 100.73.246.28
+          ansible_user: ubuntu
+          node_name: secondvm
+          rke2_node_ip: 172.17.0.7
+          advertise_address: 172.16.0.8
+          rke2_bootstrap: false
+
+        node3:
+          ansible_host: 100.83.222.90
+          ansible_user: ubuntu
+          node_name: thirdvm
+          rke2_node_ip: 172.17.0.9
+          advertise_address: 172.16.0.10
+          rke2_bootstrap: false

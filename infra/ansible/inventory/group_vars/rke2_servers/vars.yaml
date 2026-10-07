@@ -1,0 +1,24 @@
+ansible_user: ubuntu
+
+rke2_server_endpoint: 172.24.1.11
+
+rke2_cluster_cidr: 10.42.0.0/16
+rke2_service_cidr: 10.43.0.0/16
+rke2_cluster_dns: 10.43.0.10
+rke2_cluster_domain: cluster.local
+
+rke2_cni: none
+rke2_disable_kube_proxy: true
+
+rke2_lb_public_ip: <Load Balancer Public IP>
+
+rke2_tls_sans:
+  - 172.24.0.2
+  - 172.16.0.7
+  - 172.17.0.6
+  - 172.16.0.8
+  - 172.17.0.7
+  - 172.16.0.10
+  - 172.17.0.9
+
+rke2_version: v1.35.5+rke2r2

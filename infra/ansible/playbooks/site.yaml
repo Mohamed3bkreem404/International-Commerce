@@ -1,0 +1,12 @@
+- name: Configure infrastructure nodes
+  hosts: rke2_servers
+  become: true
+
+  tasks:
+    - name: Test RKE2 endpoint variable
+      ansible.builtin.debug:
+        var: rke2_server_endpoint
+
+  roles:
+    - docker
+    - rke2

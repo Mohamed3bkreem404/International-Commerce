@@ -1,0 +1,45 @@
+- name: Check if RKE2 is installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/rke2
+  register: rke2_binary
+
+- name: Create RKE2 config directory
+  ansible.builtin.file:
+    path: /etc/rancher/rke2
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install RKE2
+  ansible.builtin.shell:
+    cmd: |
+      curl -sfL https://get.rke2.io | \
+        INSTALL_RKE2_TYPE=server \
+        INSTALL_RKE2_VERSION="{{ rke2_version }}" \
+        sh -
+    executable: /bin/bash
+  when: not rke2_binary.stat.exists
+
+- name: Configure RKE2
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: /etc/rancher/rke2/config.yaml
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Enable and start RKE2
+  ansible.builtin.systemd:
+    name: rke2-server
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Configure kubectl
+  ansible.builtin.shell:
+    cmd: |
+      cp /etc/rancher/rke2/rke2.yaml {{ ansible_env.HOME }}/.kube/config
+      chmod 600 {{ ansible_env.HOME }}/.kube/config
+  args:
+    creates: "{{ ansible_env.HOME }}/.kube/config"

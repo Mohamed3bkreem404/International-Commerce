@@ -15,7 +15,7 @@ spec:
 {{/*  clusterResourceBlacklist:*/}}
 {{/*    - group: ""*/}}
 {{/*      kind: Namespace*/}}
-      #Allowed resources to create
+      #Allowed resources to be created
   namespaceResourceWhitelist:
     - group: apps
       kind: Deployment
