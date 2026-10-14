@@ -180,3 +180,6 @@ ingress:
   className: nginx
 
   host: international-commerce.local
+
+gatewayClass:
+  create: false
