@@ -1,0 +1,34 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "ecommerce.fullname" . }}-route
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  parentRefs:
+    - name: {{ include "ecommerce.fullname" . }}-gateway
+      sectionName: web
+
+  hostnames:
+    - {{ .Values.ingress.host | quote }}
+
+  rules:
+    # API Gateway
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+
+      backendRefs:
+        - name: {{ include "ecommerce.fullname" . }}-api-gateway-service
+          port: {{ .Values.apiGateway.service.port }}
+
+    # Frontend
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+
+      backendRefs:
+        - name: {{ include "ecommerce.fullname" . }}-frontend-service
+          port: {{ .Values.frontend.service.port }}
