@@ -69,33 +69,3 @@ spec:
             initialDelaySeconds: {{ .Values.redis.probes.readiness.initialDelaySeconds }}
 
             periodSeconds: {{ .Values.redis.probes.readiness.periodSeconds }}
-
-
----
-apiVersion: v1
-kind: Service
-
-metadata:
-
-  name: {{ include "ecommerce.fullname" . }}-redis
-
-  namespace: {{ .Release.Namespace }}
-
-
-spec:
-
-  selector:
-
-    {{- include "ecommerce.selectorLabels" . | nindent 4 }}
-
-    app: redis
-
-
-  ports:
-
-    - port: {{ .Values.redis.service.port }}
-
-      targetPort: {{ .Values.redis.service.port }}
-
-
-  type: ClusterIP
