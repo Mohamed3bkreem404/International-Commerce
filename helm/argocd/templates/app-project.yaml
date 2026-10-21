@@ -43,3 +43,9 @@ spec:
 
     - group: policy
       kind: PodDisruptionBudget
+
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+
+    - group: gateway.networking.k8s.io
+      kind: HTTProute
