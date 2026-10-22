@@ -42,6 +42,8 @@ spec:
 
             - name: POSTGRES_PASSWORD
               value: {{ .Values.secrets.dbPassword | quote }}
+            - name: PGDATA
+              value: {{ .Values.database.PDATA }}
 
           volumeMounts:
             - name: postgres-data
