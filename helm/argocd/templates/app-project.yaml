@@ -51,4 +51,4 @@ spec:
       kind: HTTPRoute
 
     - group: storage.k8s.io
-      kind: Storageclass
+      kind: StorageClass
