@@ -16,6 +16,11 @@ spec:
 {{/*    - group: ""*/}}
 {{/*      kind: Namespace*/}}
       #Allowed resources to be created
+  #Long horn storageclass must be cluster scoped 
+  clusterResourceWhitelist:
+    - group: storage.k8s.io
+      kind: StorageClass
+
   namespaceResourceWhitelist:
     - group: apps
       kind: Deployment
@@ -49,6 +54,3 @@ spec:
 
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-
-    - group: storage.k8s.io
-      kind: StorageClass
