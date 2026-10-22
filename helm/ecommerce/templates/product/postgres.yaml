@@ -78,6 +78,7 @@ spec:
 
           - ReadWriteOnce
 
+        storageClassName: longhorn-ha
 
         resources:
 

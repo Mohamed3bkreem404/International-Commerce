@@ -54,7 +54,7 @@ spec:
       spec:
         accessModes:
           - ReadWriteOnce
-
+        storageClassName: longhorn-ha
         resources:
           requests:
             storage: {{ .Values.database.storage }}
