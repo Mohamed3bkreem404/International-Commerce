@@ -75,5 +75,7 @@ kubectl get applications -n argocd
 
 echo "=== 9. Starting port-forward ==="
 
-kubectl port-forward service/argo-argocd-server \
+kubectl port-forward \
+  --address 100.74.230.92 \
+  service/argo-argocd-server \
   -n argocd 8080:443
