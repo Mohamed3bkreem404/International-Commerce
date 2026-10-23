@@ -20,7 +20,6 @@ spec:
   clusterResourceWhitelist:
     - group: storage.k8s.io
       kind: StorageClass
-
     - group: gateway.networking.k8s.io
       kind: GatewayClass
 
@@ -56,4 +55,4 @@ spec:
       kind: Gateway
 
     - group: gateway.networking.k8s.io
-      kind:
+      kind: HTTPRoute
