@@ -21,6 +21,9 @@ spec:
     - group: storage.k8s.io
       kind: StorageClass
 
+    - group: gateway.networking.k8s.io
+      kind: GatewayClass
+
   namespaceResourceWhitelist:
     - group: apps
       kind: Deployment
@@ -54,6 +57,3 @@ spec:
 
     - group: gateway.networking.k8s.io
       kind:
-
-    - group: gateway.networking.k8s.io
-      kind: GatewayClass
