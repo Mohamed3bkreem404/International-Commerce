@@ -1,0 +1,47 @@
+name: gitops.yml
+on:
+
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      -  "helm/**"
+      - "./.github/workflows/gitops.yml"
+
+
+  push:
+    branches:
+      - main
+    paths:
+      - "helm/**"
+      - "./.github/workflows/gitops.yml"
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate GitOps
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: setup helm
+        uses: azure/setup-helm@v4
+
+      - name: lint helm
+        run: helm list helm/ecommerce
+
+      - name: render k8s manifests
+        run: helm template ecommerce helm/ecommerce
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Lint YAML files
+        run: yamllint -d relaxed helm/
+
+
+
