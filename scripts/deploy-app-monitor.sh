@@ -65,6 +65,7 @@ else
 fi
 
 echo "=== 8. Current Applications ==="
+
 kubectl get applications -n argocd
 
 echo "=== 9. Starting Argo CD port-forward ==="
@@ -76,6 +77,8 @@ ARGO_PF_PID=$!
 
 echo "=== 10. Starting Longhorn port-forward ==="
 
+LONGHORN_PF_PID=""
+
 if kubectl get svc longhorn-frontend -n longhorn-system \
     >/dev/null 2>&1; then
   kubectl port-forward --address "$TAILSCALE_IP" \
@@ -84,17 +87,37 @@ if kubectl get svc longhorn-frontend -n longhorn-system \
   LONGHORN_PF_PID=$!
 else
   echo "Longhorn frontend service not found; skipping its port-forward."
-  LONGHORN_PF_PID=""
+fi
+
+echo "=== 11. Starting Traefik port-forward ==="
+
+TRAEFIK_PF_PID=""
+
+if kubectl get svc rke2-traefik -n kube-system \
+    >/dev/null 2>&1; then
+  kubectl port-forward --address "$TAILSCALE_IP" \
+    -n kube-system svc/rke2-traefik 8082:80 \
+    >/tmp/traefik-port-forward.log 2>&1 &
+  TRAEFIK_PF_PID=$!
+else
+  echo "Traefik service not found; skipping its port-forward."
 fi
 
 cleanup() {
-  kill "$ARGO_PF_PID" ${LONGHORN_PF_PID:+"$LONGHORN_PF_PID"} \
+  kill "$ARGO_PF_PID" \
+    ${LONGHORN_PF_PID:+"$LONGHORN_PF_PID"} \
+    ${TRAEFIK_PF_PID:+"$TRAEFIK_PF_PID"} \
     2>/dev/null || true
 }
+
 trap cleanup EXIT INT TERM
 
-echo "Argo CD:  https://$TAILSCALE_IP:8080"
-echo "Longhorn: http://$TAILSCALE_IP:8081"
+echo
+echo "=== Access URLs ==="
+echo "Argo CD:     https://$TAILSCALE_IP:8080"
+echo "Longhorn:    http://$TAILSCALE_IP:8081"
+echo "E-commerce:  http://$TAILSCALE_IP:8082"
+echo
 echo "Port-forwards are running. Press Ctrl+C to stop."
 
 wait "$ARGO_PF_PID"
