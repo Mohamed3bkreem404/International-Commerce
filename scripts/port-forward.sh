@@ -68,3 +68,10 @@ echo "Port-forwards are running. Press Ctrl+C to stop."
 while true; do
   sleep 1
 done
+
+echo
+echo "=== Argo CD Credentials ==="
+echo "Username: admin"
+echo -n "Password: "
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 --decode
+echo
