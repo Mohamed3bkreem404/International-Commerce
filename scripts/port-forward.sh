@@ -52,6 +52,16 @@ start_port_forward "Longhorn" "longhorn-system" "longhorn-frontend" \
 start_port_forward "Traefik" "kube-system" "rke2-traefik" \
   "8082:80" "/tmp/traefik-port-forward.log"
 
+
+
+echo
+echo "=== Argo CD Credentials ==="
+echo "Username: admin"
+echo -n "Password: "
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 --decode
+echo
+
+
 echo
 echo "=== Access URLs ==="
 echo "Argo CD:    https://$TAILSCALE_IP:8080"
@@ -65,13 +75,8 @@ echo "Traefik:  /tmp/traefik-port-forward.log"
 echo
 echo "Port-forwards are running. Press Ctrl+C to stop."
 
+
+
 while true; do
   sleep 1
 done
-
-echo
-echo "=== Argo CD Credentials ==="
-echo "Username: admin"
-echo -n "Password: "
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 --decode
-echo
