@@ -25,7 +25,7 @@ spec:
       trafficRouting:
         plugins:
           argoproj-labs/gatewayAPI:
-            httpRoute: rollouts-demo
+            httpRoute: cart-rollouts
       steps:
         - setWeight: 10
         - pause: {}
