@@ -13,7 +13,7 @@ helm uninstall argo -n argocd --ignore-not-found || true
 
 echo "=== 2. Deleting namespaces ==="
 
-kubectl delete namespace test monitor argocd \
+kubectl delete namespace test argocd \
   --ignore-not-found \
   --wait=true \
   --timeout=180s
@@ -22,7 +22,6 @@ echo "=== 3. Recreating namespaces ==="
 
 kubectl create namespace argocd
 kubectl create namespace test
-kubectl create namespace monitor
 
 echo "=== 4. Installing Argo CD ==="
 

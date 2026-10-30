@@ -1,0 +1,8 @@
+source:
+  path: helm/rollouts-demo
+  repoURL:   https://github.com/Mohamed3bkreem404/International-Commerce.git
+  targetRevision: main
+  helm:
+    releaseName: rollouts-demo
+destination:
+  namespace: rollouts-lab
