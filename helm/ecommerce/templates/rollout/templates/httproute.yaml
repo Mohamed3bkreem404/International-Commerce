@@ -10,11 +10,11 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /
+            value: /api/cart
       backendRefs:
-        - name: rollouts-demo-stable
+        - name: cart-stable
           port: 80
           weight: 100
-        - name: rollouts-demo-canary
+        - name: cart-canary
           port: 80
           weight: 0
