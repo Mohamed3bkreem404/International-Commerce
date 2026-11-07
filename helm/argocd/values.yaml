@@ -11,7 +11,7 @@ application:
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: test
+    namespace: app
 
   syncPolicy:
     automated: true

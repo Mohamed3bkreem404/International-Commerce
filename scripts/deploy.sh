@@ -10,10 +10,11 @@ echo "=== 1. Uninstalling Helm releases ==="
 
 helm uninstall app -n argocd --ignore-not-found || true
 helm uninstall argo -n argocd --ignore-not-found || true
+helm uninstall monitoring -n argocd --ignore-not-found || true
 
 echo "=== 2. Deleting namespaces ==="
 
-kubectl delete namespace test argocd \
+kubectl delete namespace test argocd monitoring \
   --ignore-not-found \
   --wait=true \
   --timeout=180s
@@ -21,7 +22,8 @@ kubectl delete namespace test argocd \
 echo "=== 3. Recreating namespaces ==="
 
 kubectl create namespace argocd
-kubectl create namespace test
+kubectl create namespace app
+kubectl create namespace monitoring
 
 echo "=== 4. Installing Argo CD ==="
 
