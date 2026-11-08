@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://github.com/Mohamed3bkreem404/International-Commerce.git
     targetRevision: main
-    path: helm/ecommerce/templates/rollout
+    path: helm/rollout
     helm:
       releaseName: rollouts-demo
 
