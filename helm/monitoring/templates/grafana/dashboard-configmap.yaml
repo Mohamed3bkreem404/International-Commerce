@@ -6,5 +6,5 @@ metadata:
   labels:
     grafana_dashboard: "1"
 data:
-  ecommerce.json: |
-{{ .Files.Get "grafana/dashboards/ecommerce.json" | indent 4 }}
+{{/*  ecommerce.json: |*/}}
+{{/*{{ .Files.Get "grafana/dashboards/ecommerce.json" | indent 4 }}*/}}
