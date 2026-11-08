@@ -1,42 +1,52 @@
-alertmanager:
-  replicaCount: 1
 
-  image:
-    repository: prom/alertmanager
-    tag: latest
-    pullPolicy: IfNotPresent
+prometheus:
+  enabled: true
+  prometheusSpec:
+    replicas: 1
+    scrapeInterval: 15s
 
-  service:
-    type: ClusterIP
-    port: 9093
-    targetPort: 9093
+    additionalScrapeConfigs:
+      - job_name: cart-service
+        metrics_path: /actuator/prometheus
+        static_configs:
+          - targets:
+              - ecommerce-cart-service.test:9003
 
-  config:
-    global:
-      smtpSmarthost: smtp.gmail.com:587
-      smtpFrom: neutmoha@gmail.com
-      smtpAuthUsername: neutmoha@gmail.com
-      smtpAuthPassword: ${SMTP_PASSWORD}
-      smtpRequireTls: true
+      - job_name: order-service
+        metrics_path: /actuator/prometheus
+        static_configs:
+          - targets:
+              - ecommerce-order-service.test:9004
 
-    route:
-      receiver: email-notifications
-      groupWait: 5s
-      groupInterval: 10s
-      repeatInterval: 1m
+      - job_name: payment-service
+        metrics_path: /actuator/prometheus
+        static_configs:
+          - targets:
+              - ecommerce-payment-service.test:9005
 
-    receivers:
-      name: email-notifications
-      emailConfigs:
-        to: neutmoha@gmail.com
+      - job_name: product-service
+        metrics_path: /actuator/prometheus
+        static_configs:
+          - targets:
+              - ecommerce-product-service.test:9001
+
+      - job_name: user-service
+        metrics_path: /actuator/prometheus
+        static_configs:
+          - targets:
+              - ecommerce-user-service.test:9002
 
 grafana:
-  replicaCount: 1
+  enabled: true
+  persistence:
+    enabled: true
+    type: PVC
+    storageClassName: longhorn
+    accessModes:
+      - ReadWriteOnce
+    size: 5G
 
-  image:
-    repository: grafana/grafana
-    tag: latest
-    pullPolicy: IfNotPresent
+  replicas: 1
 
   service:
     type: NodePort
@@ -44,52 +54,36 @@ grafana:
     targetPort: 3000
     nodePort: 30300
 
-prometheus:
-  replicaCount: 1
+  sidecar:
+    dashboards:
+      enabled: true
+      searchNamespace: ALL
+      label: grafana_dashboard
+      labelValue: "1"
 
-  image:
-    repository: prom/prometheus
-    tag: latest
-    pullPolicy: IfNotPresent
+alertmanager:
+  enabled: true
 
-  service:
-    type: NodePort
-    port: 9090
-    targetPort: 9090
-    nodePort: 30091
+  alertmanagerSpec:
+    replicas: 1
+    secrets:
+      - smtp-password
 
   config:
     global:
-      scrapeInterval: 15s
+      smtp_smarthost: smtp.gmail.com:587
+      smtp_from: neutmoha@gmail.com
+      smtp_auth_username: neutmoha@gmail.com
+      smtp_auth_password_file: /etc/alertmanager/secrets/smtp-password/password
+      smtp_require_tls: true
 
-    scrapeConfigs:
-      - jobName: cart-service
-        metricsPath: /actuator/prometheus
-        targets:
-          - ecommerce-cart-service.test:9003
+    route:
+      receiver: email-notifications
+      group_wait: 5s
+      group_interval: 10s
+      repeat_interval: 1m
 
-      - jobName: order-service
-        metricsPath: /actuator/prometheus
-        targets:
-          - ecommerce-order-service.test:9004
-
-      - jobName: payment-service
-        metricsPath: /actuator/prometheus
-        targets:
-          - ecommerce-payment-service.test:9005
-
-      - jobName: product-service
-        metricsPath: /actuator/prometheus
-        targets:
-          - ecommerce-product-service.test:9001
-
-      - jobName: user-service
-        metricsPath: /actuator/prometheus
-        targets:
-          - ecommerce-user-service.test:9002
-global:
-  smtpSmarthost: smtp.gmail.com:587
-  smtpFrom: neutmoha@gmail.com
-  smtpAuthUsername: neutmoha@gmail.com
-  smtpAuthPassword: ${SMTP_PASSWORD}
-  smtpRequireTls: true
+    receivers:
+      - name: email-notifications
+        email_configs:
+          - to: neutmoha@gmail.com
