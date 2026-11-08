@@ -6,7 +6,7 @@ metadata:
 spec:
   project: {{ .Values.monitoring.name}}-project
   source:
-    repoURL: {{ .Values.monitoring.source.repoURL}}
+    repoURL: {{ .Values.application.source.repoURL}}
     #branch
     targetRevision: {{ .Values.monitoring.source.targetRevision}}
     path: {{ .Values.monitoring.source.path}}
