@@ -1,51 +1,31 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
+
 metadata:
-  name: {{ .Values.application.name}}-project
-  namespace: {{ .Values.namespace}}
+  name: main-project
+  namespace: {{ .Values.namespace }}
+
 spec:
-  description: Simple project for ecommerce app
+  description: Main project for Ecommerce and Monitoring
 
   sourceRepos:
-    - {{.Values.application.source.repoURL}}
-    - {{ .Values.monitoring.source.repoURL}}
+    - {{ .Values.application.source.repoURL | quote }}
+    - {{ .Values.monitoring.source.repoURL | quote }}
+
   destinations:
-    - namespace: {{ .Values.application.destination.namespace}}
-      server: {{ .Values.application.destination.server}}
-    - namespace: {{ .Values.monitoring.destination.namespace}}
-      server: {{ .Values.monitoring.destination.server}}
+    - namespace: {{ .Values.application.destination.namespace | quote }}
+      server: {{ .Values.application.destination.server | quote }}
 
-
-
-      #Here permit charts to create ns
-{{/*  clusterResourceBlacklist:*/}}
-{{/*    - group: ""*/}}
-{{/*      kind: Namespace*/}}
-      #Allowed resources to be created
-  #Long horn storageclass must be cluster scoped
-  clusterResourceWhitelist:
-    - group: storage.k8s.io
-      kind: StorageClass
-
-    - group: gateway.networking.k8s.io
-      kind: GatewayClass
-
-    - group: rbac.authorization.k8s.io
-      kind: ClusterRole
-
-    - group: rbac.authorization.k8s.io
-      kind: ClusterRoleBinding
+    - namespace: {{ .Values.monitoring.destination.namespace | quote }}
+      server: {{ .Values.monitoring.destination.server | quote }}
 
   namespaceResourceWhitelist:
-    # Workloads
     - group: apps
       kind: Deployment
     - group: apps
       kind: StatefulSet
     - group: apps
       kind: DaemonSet
-
-    # Core
     - group: ""
       kind: Service
     - group: ""
@@ -53,11 +33,13 @@ spec:
     - group: ""
       kind: Secret
     - group: ""
-      kind: PersistentVolumeClaim
-    - group: ""
       kind: ServiceAccount
-
-    # Monitoring CRDs
+    - group: ""
+      kind: PersistentVolumeClaim
+    - group: rbac.authorization.k8s.io
+      kind: Role
+    - group: rbac.authorization.k8s.io
+      kind: RoleBinding
     - group: monitoring.coreos.com
       kind: ServiceMonitor
     - group: monitoring.coreos.com
@@ -65,28 +47,8 @@ spec:
     - group: monitoring.coreos.com
       kind: Prometheus
     - group: monitoring.coreos.com
-      kind: Alertmanager
-    - group: monitoring.coreos.com
       kind: PrometheusRule
-
-    # Networking
-    - group: networking.k8s.io
-      kind: Ingress
-
-    # Autoscaling
-    - group: autoscaling
-      kind: HorizontalPodAutoscaler
-
-    # Policy
+    - group: monitoring.coreos.com
+      kind: Alertmanager
     - group: policy
       kind: PodDisruptionBudget
-
-    # Gateway API
-    - group: gateway.networking.k8s.io
-      kind: Gateway
-    - group: gateway.networking.k8s.io
-      kind: HTTPRoute
-
-    # Argo Rollouts
-    - group: argoproj.io
-      kind: Rollout
