@@ -20,5 +20,8 @@ spec:
     namespace: rollouts-lab
 
   syncPolicy:
+    automated:
+      prune: {{ .Values.monitoring.syncPolicy.prune}}
+      selfHeal: {{ .Values.monitoring.syncPolicy.selfHeal}}
     syncOptions:
       - CreateNamespace=true
