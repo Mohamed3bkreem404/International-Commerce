@@ -20,42 +20,67 @@ spec:
   clusterResourceWhitelist:
     - group: storage.k8s.io
       kind: StorageClass
+
     - group: gateway.networking.k8s.io
       kind: GatewayClass
 
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+
   namespaceResourceWhitelist:
+    # Workloads
     - group: apps
       kind: Deployment
-
     - group: apps
       kind: StatefulSet
+    - group: apps
+      kind: DaemonSet
 
+    # Core
     - group: ""
       kind: Service
-
     - group: ""
       kind: ConfigMap
-
     - group: ""
       kind: Secret
-
     - group: ""
       kind: PersistentVolumeClaim
+    - group: ""
+      kind: ServiceAccount
 
+    # Monitoring CRDs
+    - group: monitoring.coreos.com
+      kind: ServiceMonitor
+    - group: monitoring.coreos.com
+      kind: PodMonitor
+    - group: monitoring.coreos.com
+      kind: Prometheus
+    - group: monitoring.coreos.com
+      kind: Alertmanager
+    - group: monitoring.coreos.com
+      kind: PrometheusRule
+
+    # Networking
     - group: networking.k8s.io
       kind: Ingress
 
+    # Autoscaling
     - group: autoscaling
       kind: HorizontalPodAutoscaler
 
+    # Policy
     - group: policy
       kind: PodDisruptionBudget
 
+    # Gateway API
     - group: gateway.networking.k8s.io
       kind: Gateway
-
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
 
-    - group: argoproj.io/v1alpha1
+    # Argo Rollouts
+    - group: argoproj.io
       kind: Rollout
