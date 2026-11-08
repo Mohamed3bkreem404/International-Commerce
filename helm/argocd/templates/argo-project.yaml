@@ -8,9 +8,15 @@ spec:
 
   sourceRepos:
     - {{.Values.application.source.repoURL}}
+    - {{ .Values.monitoring.source.repoURL}}
   destinations:
     - namespace: {{ .Values.application.destination.namespace}}
       server: {{ .Values.application.destination.server}}
+    - namespace: {{ .Values.monitoring.destination.namespace}}
+      server: {{ .Values.monitoring.destination.server}}
+
+
+
       #Here permit charts to create ns
 {{/*  clusterResourceBlacklist:*/}}
 {{/*    - group: ""*/}}

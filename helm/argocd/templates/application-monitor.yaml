@@ -4,7 +4,7 @@ metadata:
   name: {{ .Values.monitoring.name}}
   namespace: {{ .Values.namespace}}
 spec:
-  project: {{ .Values.application.name}}-project
+  project: {{ .Values.monitoring.name}}-project
   source:
     repoURL: {{ .Values.monitoring.source.repoURL}}
     #branch
